@@ -43,6 +43,17 @@ uv run jupyter lab
 Epoch AI "Notable AI Models" database — public CSV download.
 Retrieval date and column-mapping notes live in `docs/data_dictionary.md`.
 
+## Phase 1 headline (Rule A, 2018+)
+
+| Metric | Annual × | Doubling | R² | n |
+|---|---|---|---|---|
+| Training compute (FLOP) | 5.97× | 4.7 mo | 0.84 | 113 |
+| Training cost (2023 USD) | 4.89× | 5.2 mo | 0.72 | 74 |
+| Cost per FLOP | 0.76× (~24%/yr decline) | — | 0.21 | 74 |
+
+Full memo with rule sensitivity, cost-variant sensitivity, and Phase 2
+handoff parameters: `docs/phase1_findings.md`.
+
 ## Phase
 
 Phase 1 only. Out of scope: capability forecasting, automation modeling,
