@@ -408,6 +408,29 @@ layer (Phase 4 Handoff sheet).
 
 ---
 
+## Streamlit scenario explorer (no static output)
+
+**What it is:** a read-only interactive web app launched via
+`uv run demo`. Reads from the DuckDB review database (with CSV
+fallback) and renders 9 pages in a Streamlit sidebar.
+
+**How to use it:** see
+[`streamlit_demo_guide.md`](streamlit_demo_guide.md). Open
+[`http://localhost:8501`](http://localhost:8501) after running
+`uv run demo`. Page 6 (Effective-Compute Handoff) is the cleanest
+read of the slow / base / fast envelope for downstream layers.
+
+**What *not* to infer:** the app is a *view* over the existing
+artifacts; it does not produce its own outputs and never writes
+back to the YAMLs. If the underlying artifacts change you need
+to rerun the upstream pipelines + `uv run database` and restart
+the app.
+
+**Downstream consumer:** human reviewers; presentation /
+explanation contexts.
+
+---
+
 ## outputs/runs/latest_run_manifest.json
 
 **What it is:** a small JSON file capturing the most recent

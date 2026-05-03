@@ -19,6 +19,7 @@ New readers should start with the orientation docs in `docs/`:
 7. [`docs/component_contracts.md`](docs/component_contracts.md) — per-component inputs, outputs, and downstream consumers.
 8. [`docs/model_walkthrough.md`](docs/model_walkthrough.md) — guided tour through the actual outputs.
 9. [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md) — how to use the DuckDB review database and Excel workbook.
+10. [`docs/streamlit_demo_guide.md`](docs/streamlit_demo_guide.md) — how to launch and use the interactive scenario explorer.
 
 Then:
 
@@ -48,6 +49,7 @@ uv run supply              # rebuild supply-capacity deliverables
 uv run allocation          # rebuild allocation deliverables (requires supply)
 uv run database            # build the DuckDB review database
 uv run workbook            # build the Excel review workbook
+uv run demo                # launch the Streamlit scenario explorer
 uv run validate-outputs    # confirm every artifact is present + non-empty
 uv run pytest              # run the test suite (32 tests)
 ```
@@ -57,8 +59,10 @@ and `data/processed/` artifacts. `uv run database` and `uv run workbook`
 are the institutional review layer — they consume those artifacts to
 produce a single DuckDB file (`outputs/database/ai_economy.duckdb`)
 and an 11-sheet Excel workbook (`outputs/workbooks/ai_economy_model_review.xlsx`).
-See [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md)
-for how to use them.
+`uv run demo` launches a read-only Streamlit scenario explorer on top
+of the DuckDB. See [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md)
+and [`docs/streamlit_demo_guide.md`](docs/streamlit_demo_guide.md) for
+how to use them.
 
 ## Structure
 
@@ -106,6 +110,13 @@ pipelines/
   build_review_database.py  `uv run database` entry point
   export_workbook.py        `uv run workbook` entry point
   validate_repo_outputs.py  `uv run validate-outputs` entry point
+app/
+  streamlit_app.py          Streamlit landing page (`uv run demo`)
+  data_loader.py            DuckDB-first / CSV-fallback accessors (cached)
+  formatting.py             Number-formatter helpers (FLOP, %, USD)
+  charts.py                 Plotly chart helpers
+  launcher.py               `uv run demo` entry point
+  pages/                    9 sidebar-navigable pages
 scenarios/
   supply_*.yaml             Four supply-side scenarios
   allocation_*.yaml         Four allocation scenarios

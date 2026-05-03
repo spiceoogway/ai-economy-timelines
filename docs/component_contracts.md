@@ -175,6 +175,48 @@ canonical input table.
 
 ---
 
+## Scenario Explorer (Streamlit)
+
+**Status:** ✓ built
+
+**Inputs:**
+- `outputs/database/ai_economy.duckdb` (preferred)
+- `outputs/tables/*.csv` (fallback)
+- `data/assumptions/*.yaml` (for the source/confidence audit pages)
+
+**Transformation:**
+- Read-only: the app never writes back to YAMLs, CSVs, or the database
+- Caches every loader via `@st.cache_data` so reads happen once per
+  Streamlit session
+- 9 pages render: Model Overview, Scenario Matrix, Supply Capacity,
+  Allocation Layer, Largest Frontier Run, Effective-Compute Handoff,
+  Assumptions, Source Provenance (optional), Run Manifest (optional)
+- Plotly for interactive charts; Streamlit native dataframes for tables
+
+**Outputs:**
+- No static outputs — the demo is a live web view at `localhost:8501`
+- Users can download CSV slices via every page's download buttons,
+  but those are derived from the existing tables
+
+**Does not include:**
+- Editable assumptions
+- Live model recomputation from sliders
+- Cloud deployment / authentication
+- Effective-compute, capability, or revenue layers (those are next /
+  future)
+
+**Main uncertainty:** the app picks up whatever's in the DuckDB or
+CSVs at launch time. If the upstream artifacts are stale relative to
+the YAMLs, the app shows stale numbers without warning. Mitigation:
+the Run Manifest page surfaces the last `uv run validate-outputs`
+timestamp and pass/fail status.
+
+**Downstream consumer:** human reviewers (presenting the model);
+the effective-compute layer's design (the Effective-Compute Handoff
+page is the canonical read of the input envelope).
+
+---
+
 ## Effective Compute Layer
 
 **Status:** ✗ future

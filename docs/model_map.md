@@ -30,6 +30,7 @@ Everything beyond effective compute is deferred.
 | Supply capacity model | ✓ built | `uv run supply` | `outputs/tables/supply_fundamental_inputs_by_year.csv` |
 | Compute allocation | ✓ built | `uv run allocation` | `outputs/tables/allocation_largest_frontier_run.csv` |
 | Review layer (DuckDB + Excel) | ✓ built | `uv run database` / `uv run workbook` | `outputs/database/ai_economy.duckdb`, `outputs/workbooks/ai_economy_model_review.xlsx` |
+| Scenario explorer (Streamlit) | ✓ built | `uv run demo` | live app at `localhost:8501` |
 | Effective compute | ✗ next | — | — |
 | Capability mapping | ✗ future | — | — |
 | Probabilistic projections | ✗ future | — | — |

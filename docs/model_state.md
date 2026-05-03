@@ -1,6 +1,6 @@
 # Model State
 
-**Last updated:** 2026-05-03 (review layer landed)
+**Last updated:** 2026-05-03 (Streamlit scenario explorer landed)
 
 ## Built
 
@@ -52,6 +52,23 @@
   - `outputs/runs/latest_run_manifest.json` — run metadata + pass/fail counts
 - **Validation:** `uv run validate-outputs` walks the outputs tree and verifies every promised artifact exists and is non-empty (53 checks; current state 53/53 pass).
 
+### Scenario explorer (Streamlit)
+
+- **Status:** complete
+- **Run command:** `uv run demo` (wraps `streamlit run app/streamlit_app.py`)
+- **Main guide:** [`docs/streamlit_demo_guide.md`](streamlit_demo_guide.md)
+- **Pages:**
+  - 1. Model Overview — built/next/future status + headline numbers
+  - 2. Scenario Matrix — 16 combined scenarios with slow/base/fast tags
+  - 3. Supply Capacity — 4 charts + tables, year-range slider
+  - 4. Allocation Layer — bucket stacked-area + share trajectories
+  - 5. Largest Frontier Run — headline forward output, optional historical overlay
+  - 6. Effective-Compute Handoff — slow/base/fast envelope for downstream consumers
+  - 7. Assumptions — source/confidence audit, share assumptions by year
+  - 8. Source Provenance — aggregate audit + full table
+  - 9. Run Manifest — when each artifact was last regenerated
+- **Data source:** DuckDB review database (with CSV fallback). All loaders cached via `@st.cache_data`.
+
 ## Current run commands
 
 ```bash
@@ -60,7 +77,8 @@ uv run historical          # rebuild historical-baseline deliverables
 uv run supply              # rebuild supply-capacity deliverables
 uv run allocation          # rebuild allocation deliverables (requires supply)
 uv run database            # build the DuckDB review database
-uv run workbook            # build the Excel review workbook
+uv run workbook             # build the Excel review workbook
+uv run demo                # launch the Streamlit scenario explorer
 uv run validate-outputs    # confirm artifacts present + non-empty
 uv run pytest              # run the test suite (32 tests)
 ```
