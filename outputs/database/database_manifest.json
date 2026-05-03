@@ -1,0 +1,62 @@
+{
+  "schema_version": "1",
+  "created_at": "2026-05-03T22:19:37.809821+00:00",
+  "git_commit": "175eed1",
+  "database_path": "outputs/database/ai_economy.duckdb",
+  "input_files": [
+    "historical_models.csv",
+    "historical_trend_estimates.csv",
+    "historical_hardware_summary.csv",
+    "supply_fundamental_inputs_by_year.csv",
+    "supply_scenario_summary.csv",
+    "supply_binding_constraints.csv",
+    "supply_capex_requirements.csv",
+    "supply_sensitivity_analysis.csv",
+    "allocation_compute_by_bucket.csv",
+    "allocation_largest_frontier_run.csv",
+    "allocation_scenario_summary.csv",
+    "allocation_vs_historical_trend.csv",
+    "allocation_share_assumptions_by_year.csv"
+  ],
+  "tables_created": [
+    "historical_models",
+    "historical_trend_estimates",
+    "historical_hardware_summary",
+    "supply_fundamental_inputs_by_year",
+    "supply_scenario_summary",
+    "supply_binding_constraints",
+    "supply_capex_requirements",
+    "supply_sensitivity_analysis",
+    "allocation_compute_by_bucket",
+    "allocation_largest_frontier_run",
+    "allocation_scenario_summary",
+    "allocation_vs_historical_trend",
+    "allocation_share_assumptions_by_year",
+    "sources_and_confidence"
+  ],
+  "views_created": [
+    "v_largest_run_2040_ranked",
+    "v_phase4_handoff",
+    "v_scenario_matrix",
+    "v_base_case_timeseries",
+    "v_slow_base_fast_envelope",
+    "v_sources_and_confidence"
+  ],
+  "row_counts": {
+    "historical_models": 1011,
+    "historical_trend_estimates": 45,
+    "historical_hardware_summary": 101,
+    "supply_fundamental_inputs_by_year": 68,
+    "supply_scenario_summary": 28,
+    "supply_binding_constraints": 8,
+    "supply_capex_requirements": 68,
+    "supply_sensitivity_analysis": 255,
+    "allocation_compute_by_bucket": 272,
+    "allocation_largest_frontier_run": 272,
+    "allocation_scenario_summary": 16,
+    "allocation_vs_historical_trend": 272,
+    "allocation_share_assumptions_by_year": 68,
+    "sources_and_confidence": 60
+  },
+  "note": "Generated artifact. Source of truth is YAML / Python / CSV / Markdown. Rebuild with: uv run database"
+}
