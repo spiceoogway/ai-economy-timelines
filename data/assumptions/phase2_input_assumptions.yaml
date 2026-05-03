@@ -1,0 +1,493 @@
+h100_equivalent_shipments:
+  unit: units
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 3500000.0, notes: '2024 actual: NVIDIA H100/H200 ~2M (Epoch
+          median 1.5-2M) + AMD/TPU/Trainium/China ~1.5M H100-eq.', source: author_synthesis_from_epoch_2024_scaling}
+      - {year: 2025, value: 6500000.0, notes: '2025 actual: B200 ramp + GB200 + AMD
+          MI325. NVIDIA DC revenue ~$200B implies ~5M H100e, total ~6.5M H100e.'}
+      - {year: 2026, value: 11000000.0, notes: '2026 projection: continued B200/GB200
+          ramp + Rubin in Q4 + TPU v7. ~70% YoY.'}
+      - {year: 2030, value: 60000000.0, notes: 'Epoch 2030 stock 20-400M H100e median
+          100M. With 5y lifetime base, annual shipments ~50-70M.', source: epoch_2024_scaling}
+      - {year: 2040, value: 250000000.0, notes: 2040 extrapolation slowing to ~15%
+          CAGR post-2030., confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 3500000.0, source: author_synthesis_from_epoch_2024_scaling}
+      - {year: 2025, value: 5000000.0, notes: Slower B200 ramp due to CoWoS / HBM
+          constraints (Epoch identifies these as primary).}
+      - {year: 2026, value: 7000000.0, notes: 40% YoY (constrained)., confidence: low}
+      - {year: 2030, value: 20000000.0, notes: Epoch 2030 lower-bound 20M H100e.,
+        source: epoch_2024_scaling}
+      - {year: 2040, value: 80000000.0, confidence: low}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 3500000.0, notes: 'Same as base, chips abundant.', source: author_synthesis_from_epoch_2024_scaling}
+      - {year: 2025, value: 6500000.0}
+      - {year: 2026, value: 11000000.0}
+      - {year: 2030, value: 60000000.0, source: epoch_2024_scaling}
+      - {year: 2040, value: 250000000.0, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 3500000.0, source: author_synthesis_from_epoch_2024_scaling}
+      - {year: 2025, value: 7500000.0, notes: Higher with Stargate-class spend pulling
+          demand forward.}
+      - {year: 2026, value: 14000000.0, confidence: low}
+      - {year: 2030, value: 150000000.0, notes: Toward Epoch's upper-end 100-400M.,
+        source: epoch_2024_scaling}
+      - {year: 2040, value: 500000000.0, confidence: low}
+accelerator_lifetime_years:
+  unit: years
+  scenarios:
+    base:
+      source: hyperscaler_10k
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 5.0, notes: 'Hyperscalers historically 4-5y, some moving
+          to 6y.'}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 6.0, notes: Forced longer holding under chip scarcity.}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 6.0, notes: Slower refresh when DC slots scarce.}
+    capex_rich:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 4.0, notes: Faster refresh with abundant capex.}
+peak_flops_per_h100e:
+  unit: flops
+  scenarios:
+    base:
+      source: nvidia_h100_spec
+      confidence: high
+      milestones:
+      - {year: 2024, value: 989000000000000.0, notes: H100 SXM 989 TFLOPS FP16 dense.
+          Constant by H100-eq definition.}
+    chip_bottleneck:
+      source: nvidia_h100_spec
+      confidence: high
+      milestones:
+      - {year: 2024, value: 989000000000000.0}
+    power_dc_bottleneck:
+      source: nvidia_h100_spec
+      confidence: high
+      milestones:
+      - {year: 2024, value: 989000000000000.0}
+    capex_rich:
+      source: nvidia_h100_spec
+      confidence: high
+      milestones:
+      - {year: 2024, value: 989000000000000.0}
+hardware_perf_index_relative_to_h100:
+  unit: multiplier
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.1, notes: '2024 mix: H100 + early H200 + late-2024 B200.',
+        confidence: medium}
+      - {year: 2025, value: 1.8, notes: '2025 mix: B200/GB200 dominant.', confidence: medium}
+      - {year: 2030, value: 5.0, notes: Rubin then post-Rubin generations.}
+      - {year: 2040, value: 15.0, notes: Long-run extrapolation.}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.1, confidence: medium}
+      - {year: 2030, value: 4.0, notes: Slower per-chip improvement under packaging
+          constraints.}
+      - {year: 2040, value: 10.0}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.1, confidence: medium}
+      - {year: 2030, value: 5.0}
+      - {year: 2040, value: 15.0}
+    capex_rich:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.1, confidence: medium}
+      - {year: 2030, value: 6.0, notes: Faster refresh pulls perf index up.}
+      - {year: 2040, value: 20.0}
+power_kw_per_h100e:
+  unit: kw
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 0.7, notes: H100 SXM 700W TDP., source: nvidia_h100_spec}
+      - {year: 2030, value: 0.25, notes: Implied by 24x perf-per-watt and ~5x perf
+          increase., source: epoch_2024_scaling, confidence: medium}
+      - {year: 2040, value: 0.12, notes: Continued efficiency gains slowing., confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 0.7, source: nvidia_h100_spec}
+      - {year: 2030, value: 0.3, notes: Slower efficiency improvement., confidence: medium}
+      - {year: 2040, value: 0.18, confidence: low}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 0.7, source: nvidia_h100_spec}
+      - {year: 2030, value: 0.25, source: epoch_2024_scaling, confidence: medium}
+      - {year: 2040, value: 0.12, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 0.7, source: nvidia_h100_spec}
+      - {year: 2030, value: 0.22, notes: Faster refresh accesses leading-edge., confidence: medium}
+      - {year: 2040, value: 0.1, confidence: low}
+server_power_overhead:
+  unit: multiplier
+  scenarios:
+    base:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 1.5, notes: CPU + NIC + storage + power-delivery losses.}
+    chip_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 1.5}
+    power_dc_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 1.5}
+    capex_rich:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 1.4, notes: More efficient designs at hyperscale.}
+pue:
+  unit: multiplier
+  scenarios:
+    base:
+      source: industry_typical
+      confidence: high
+      milestones:
+      - {year: 2024, value: 1.2, notes: Modern hyperscale AI DC ~1.15-1.25.}
+      - {year: 2030, value: 1.12, notes: Liquid-cooling adoption., confidence: medium}
+      - {year: 2040, value: 1.08, notes: Asymptote., confidence: low}
+    chip_bottleneck:
+      source: industry_typical
+      confidence: high
+      milestones:
+      - {year: 2024, value: 1.2}
+      - {year: 2030, value: 1.15, confidence: medium}
+      - {year: 2040, value: 1.1, confidence: low}
+    power_dc_bottleneck:
+      source: industry_typical
+      confidence: high
+      milestones:
+      - {year: 2024, value: 1.25, notes: Slightly worse — older DC stock pressed into
+          AI service.}
+      - {year: 2030, value: 1.18, confidence: medium}
+      - {year: 2040, value: 1.12, confidence: low}
+    capex_rich:
+      source: industry_typical
+      confidence: high
+      milestones:
+      - {year: 2024, value: 1.18, notes: Greenfield purpose-built liquid-cooled.}
+      - {year: 2030, value: 1.1, confidence: medium}
+      - {year: 2040, value: 1.06, confidence: low}
+ai_datacenter_capacity_mw:
+  unit: mw
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 12000.0, notes: Global AI-dedicated DC ~12 GW end-2024.,
+        source: author_synthesis_from_iea_energy_ai}
+      - {year: 2025, value: 22000.0, notes: Hyperscaler buildout accelerating.}
+      - {year: 2026, value: 38000.0}
+      - {year: 2030, value: 80000.0, notes: Implied by 945 TWh DC × ~50% accelerated-server
+          share with utilization correction., source: iea_energy_ai}
+      - {year: 2040, value: 300000.0, confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 12000.0}
+      - {year: 2025, value: 22000.0}
+      - {year: 2026, value: 38000.0}
+      - {year: 2030, value: 80000.0, source: iea_energy_ai}
+      - {year: 2040, value: 300000.0, confidence: low}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 12000.0}
+      - {year: 2025, value: 18000.0, notes: Slower buildout — interconnection queues.}
+      - {year: 2026, value: 25000.0}
+      - {year: 2030, value: 40000.0, notes: Half of base case.}
+      - {year: 2040, value: 120000.0, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 12000.0}
+      - {year: 2025, value: 25000.0, notes: Stargate + sovereign + hyperscaler concurrent.}
+      - {year: 2026, value: 50000.0}
+      - {year: 2030, value: 160000.0, notes: 2x base., confidence: low}
+      - {year: 2040, value: 600000.0, confidence: low}
+ai_share_of_dc_power:
+  unit: fraction
+  scenarios:
+    base:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.85, notes: Most AI-dedicated DC capacity is AI-only.}
+    chip_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.85}
+    power_dc_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.8, notes: Slightly lower — more shared with non-AI loads.}
+    capex_rich:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.9, notes: Greenfield AI-only campuses.}
+dc_packing_efficiency:
+  unit: fraction
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.0, notes: 'Sprint-2 default: power and DC tightly coupled.',
+        source: industry_typical, confidence: medium}
+      - {year: 2030, value: 0.95, notes: Slight tightening as cluster sizes grow.}
+      - {year: 2040, value: 0.9}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.0, source: industry_typical, confidence: medium}
+      - {year: 2030, value: 0.95}
+      - {year: 2040, value: 0.9}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.85, notes: Cooling/slot/transformer constraints kick
+          in early.}
+      - {year: 2030, value: 0.7, notes: Cluster-scale cooling and interconnect bind.}
+      - {year: 2040, value: 0.65, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 1.0, source: industry_typical, confidence: medium}
+      - {year: 2030, value: 0.95}
+      - {year: 2040, value: 0.9}
+cluster_utilization:
+  unit: fraction
+  scenarios:
+    base:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.4, notes: 'Blended training+inference, MFU ~35-50%.'}
+      - {year: 2030, value: 0.5, notes: Improving with software stack.}
+      - {year: 2040, value: 0.55, confidence: low}
+    chip_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.45, notes: Higher pressure to extract MFU.}
+      - {year: 2030, value: 0.55}
+      - {year: 2040, value: 0.6, confidence: low}
+    power_dc_bottleneck:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.4}
+      - {year: 2030, value: 0.48}
+      - {year: 2040, value: 0.55, confidence: low}
+    capex_rich:
+      source: industry_typical
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 0.4}
+      - {year: 2030, value: 0.5}
+      - {year: 2040, value: 0.55, confidence: low}
+accelerator_unit_cost_usd:
+  unit: usd
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 30000.0, notes: 'H100 list ~$25-40K, ~$30K average.',
+        source: nvidia_ir}
+      - {year: 2030, value: 15000.0, notes: ~50% reduction in $/H100-eq via perf scaling.,
+        confidence: medium}
+      - {year: 2040, value: 7000.0, confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 35000.0, notes: Tighter supply lifts ASP., source: nvidia_ir,
+        confidence: medium}
+      - {year: 2030, value: 22000.0}
+      - {year: 2040, value: 14000.0}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 30000.0, source: nvidia_ir}
+      - {year: 2030, value: 15000.0, confidence: medium}
+      - {year: 2040, value: 7000.0, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: high
+      milestones:
+      - {year: 2024, value: 30000.0, source: nvidia_ir}
+      - {year: 2030, value: 15000.0, confidence: medium}
+      - {year: 2040, value: 7000.0, confidence: low}
+cluster_capex_multiplier:
+  unit: multiplier
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 2.2, notes: Chip + server + NW + DC + power infra ≈ 2.2x
+          chip cost.}
+      - {year: 2030, value: 2.5, notes: Power infra share rising to 40% per Epoch.,
+        source: author_synthesis_from_epoch_2024_scaling}
+      - {year: 2040, value: 2.6, confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 2.2}
+      - {year: 2030, value: 2.5}
+      - {year: 2040, value: 2.6, confidence: low}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 2.5, notes: Power infra premium higher under DC scarcity.}
+      - {year: 2030, value: 3.0}
+      - {year: 2040, value: 3.2, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 2.0}
+      - {year: 2030, value: 2.3}
+      - {year: 2040, value: 2.5, confidence: low}
+ai_infrastructure_capex_usd:
+  unit: usd
+  scenarios:
+    base:
+      source: hyperscaler_10k
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 210000000000.0, notes: '$210B globally, hyperscaler AI
+          capex ~$155B + NVIDIA-customer ~$30B + sovereign ~$25B.'}
+      - {year: 2025, value: 350000000000.0, notes: 'Hyperscaler 2025 guidance ~$340B
+          combined, AI share ~75%.'}
+      - {year: 2026, value: 500000000000.0, notes: 'Public guidance ~$450B combined
+          hyperscaler 2026, +sovereign growth.'}
+      - {year: 2030, value: 1500000000000.0, notes: 'Continued ~30%/yr growth, $1.5T/yr.',
+        source: author_synthesis, confidence: low}
+      - {year: 2040, value: 3000000000000.0, notes: Asymptote at ~3% of global GDP.,
+        source: author_synthesis, confidence: low}
+    chip_bottleneck:
+      source: hyperscaler_10k
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 210000000000.0, notes: Capex unconstrained but chips bind.}
+      - {year: 2025, value: 350000000000.0}
+      - {year: 2026, value: 500000000000.0}
+      - {year: 2030, value: 1500000000000.0, source: author_synthesis, confidence: low}
+      - {year: 2040, value: 3000000000000.0, source: author_synthesis, confidence: low}
+    power_dc_bottleneck:
+      source: hyperscaler_10k
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 210000000000.0}
+      - {year: 2025, value: 350000000000.0}
+      - {year: 2026, value: 500000000000.0}
+      - {year: 2030, value: 1500000000000.0, source: author_synthesis, confidence: low}
+      - {year: 2040, value: 3000000000000.0, source: author_synthesis, confidence: low}
+    capex_rich:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 250000000000.0, notes: Higher 2024 baseline including
+          announced sovereign programs., source: hyperscaler_10k}
+      - {year: 2025, value: 500000000000.0, notes: '$500B Stargate announced over
+          4 yrs, $125B/yr addition starting 2025.', source: stargate_announce}
+      - {year: 2026, value: 750000000000.0}
+      - {year: 2030, value: 3000000000000.0, notes: '$3T/yr, ~6% of global GDP toward
+          AI.', confidence: low}
+      - {year: 2040, value: 8000000000000.0, confidence: low}
+cloud_rental_usd_per_h100e_year:
+  unit: usd
+  scenarios:
+    base:
+      source: author_synthesis
+      confidence: medium
+      milestones:
+      - {year: 2024, value: 15000.0, notes: ~$2/hr × 8760 hr × 80% utilization. H100
+          cloud market 2024., source: industry_typical}
+      - {year: 2030, value: 9000.0, notes: Decline tracking accelerator-cost decline
+          minus margin compression.}
+      - {year: 2040, value: 5000.0, confidence: low}
+    chip_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 18000.0, notes: Tighter supply lifts cloud rates., source: industry_typical,
+        confidence: medium}
+      - {year: 2030, value: 12000.0}
+      - {year: 2040, value: 8000.0}
+    power_dc_bottleneck:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 15000.0, source: industry_typical, confidence: medium}
+      - {year: 2030, value: 11000.0, notes: DC scarcity premium.}
+      - {year: 2040, value: 7000.0}
+    capex_rich:
+      source: author_synthesis
+      confidence: low
+      milestones:
+      - {year: 2024, value: 15000.0, source: industry_typical, confidence: medium}
+      - {year: 2030, value: 7000.0, notes: Faster price decline in oversupply.}
+      - {year: 2040, value: 4000.0}

@@ -37,7 +37,7 @@ import pandas as pd
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-ASSUMPTIONS_CSV = REPO_ROOT / "data" / "assumptions" / "phase2_input_assumptions.csv"
+ASSUMPTIONS_PATH = REPO_ROOT / "data" / "assumptions" / "phase2_input_assumptions.yaml"
 SCENARIOS_DIR = REPO_ROOT / "scenarios"
 
 SECONDS_PER_YEAR = 365.25 * 24 * 3600
@@ -69,8 +69,59 @@ class ScenarioConfig:
         )
 
 
-def load_assumptions(path: Path = ASSUMPTIONS_CSV) -> pd.DataFrame:
-    """Load the long-format assumptions CSV (skipping `#` comment lines)."""
+def load_assumptions(path: Path = ASSUMPTIONS_PATH) -> pd.DataFrame:
+    """Load the assumptions table as a long-format DataFrame.
+
+    Supports both YAML (canonical, nested by parameter) and the legacy CSV
+    format. Returns columns: parameter, scenario, year, value, unit,
+    source, confidence, notes.
+    """
+    if path.suffix in (".yaml", ".yml"):
+        return _load_assumptions_yaml(path)
+    return _load_assumptions_csv(path)
+
+
+def _load_assumptions_yaml(path: Path) -> pd.DataFrame:
+    raw = yaml.safe_load(path.read_text())
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path}: top-level must be a mapping of parameter → block")
+    rows = []
+    for param, pblock in raw.items():
+        if not isinstance(pblock, dict) or "scenarios" not in pblock:
+            raise ValueError(
+                f"{path}: parameter {param!r} must be a mapping with a 'scenarios' key"
+            )
+        unit = pblock.get("unit")
+        for scenario, sblock in pblock["scenarios"].items():
+            milestones = sblock.get("milestones") or []
+            if not milestones:
+                raise ValueError(
+                    f"{path}: {param}/{scenario} has no milestones"
+                )
+            default_src = sblock.get("source")
+            default_conf = sblock.get("confidence")
+            for m in milestones:
+                if "year" not in m or "value" not in m:
+                    raise ValueError(
+                        f"{path}: {param}/{scenario} milestone missing year/value: {m!r}"
+                    )
+                rows.append(
+                    {
+                        "parameter": param,
+                        "scenario": scenario,
+                        "year": int(m["year"]),
+                        "value": float(m["value"]),
+                        "unit": unit,
+                        "source": m.get("source", default_src),
+                        "confidence": m.get("confidence", default_conf),
+                        "notes": m.get("notes", ""),
+                    }
+                )
+    return pd.DataFrame(rows)
+
+
+def _load_assumptions_csv(path: Path) -> pd.DataFrame:
+    """Legacy CSV reader (kept for one cycle to support migration tests)."""
     df = pd.read_csv(path, comment="#")
     df.columns = [c.strip() for c in df.columns]
     df["parameter"] = df["parameter"].str.strip()
