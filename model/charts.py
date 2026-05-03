@@ -13,15 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from model.runtime import EPOCH_SOURCE_LINE, RULE_COLORS
 from model.trend_fitting import TrendFit
-
-RULE_COLORS = {
-    "frontier_rule_a": "tab:blue",
-    "frontier_rule_b": "tab:orange",
-    "frontier_rule_c": "tab:green",
-}
-
-EPOCH_SOURCE_LINE = "Source: Epoch AI Notable AI Models (retrieved 2026-05-02)"
 
 
 def _scatter_with_rules(

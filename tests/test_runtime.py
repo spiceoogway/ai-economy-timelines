@@ -1,33 +1,14 @@
 """Smoke tests for cross-cutting constants.
 
-The runtime module doesn't exist yet (Tier A change 3). This test
-locks in the *contract*: any future scenario YAML must have a color
-entry, and any constraint must have a color entry. We check the
-constants wherever they currently live so this test passes today and
-keeps passing after the runtime extraction.
+Locks in the contract: every scenario YAML must have a SCENARIO_COLORS
+entry, and every CONSTRAINTS value must have a CONSTRAINT_COLORS entry.
 """
 from __future__ import annotations
-
-from pathlib import Path
 
 import yaml
 
 from model.fundamental_inputs import CONSTRAINTS, SCENARIOS_DIR
-
-# Try the runtime module first (post-Tier-A.3); fall back to the
-# pipelines driver (pre-Tier-A.3) so this test passes through the
-# refactor.
-try:
-    from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS  # type: ignore
-except ImportError:
-    import sys
-
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "notebooks"))
-    try:
-        from run_phase2_sprint2 import CONSTRAINT_COLORS, SCENARIO_COLORS  # type: ignore
-    except ImportError:
-        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipelines"))
-        from phase2 import CONSTRAINT_COLORS, SCENARIO_COLORS  # type: ignore
+from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS
 
 
 def test_every_scenario_has_a_color() -> None:

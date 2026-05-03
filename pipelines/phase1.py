@@ -1,8 +1,6 @@
 """Phase 1 driver: produce ALL Phase 1 deliverables in one run.
 
-Run with: `uv run python notebooks/run_phase1.py`
-
-Supersedes notebooks/run_sprint1.py.
+Run with: `uv run phase1`
 
 Produces:
   data/processed/frontier_models_historical.{csv,parquet}
@@ -20,23 +18,13 @@ Produces:
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
-import numpy as np
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
-
+from model import charts
 from model.data_cleaning import load_raw, select_processed
 from model.frontier_filters import add_frontier_flags
+from model.runtime import CHARTS_DIR, PROCESSED_DIR, TABLES_DIR
 from model.trend_fitting import fit_log_linear, fits_to_frame
-from model import charts
-
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
-CHARTS_DIR = REPO_ROOT / "outputs" / "charts"
-TABLES_DIR = REPO_ROOT / "outputs" / "tables"
 
 NARROW_START_YEAR = 2018
 TOP_N_ORGS = 10

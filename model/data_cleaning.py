@@ -5,8 +5,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-RAW_NOTABLE = REPO_ROOT / "data" / "raw" / "epoch_notable_ai_models_raw.csv"
+from model.runtime import RAW_NOTABLE_AI_MODELS as RAW_NOTABLE, REPO_ROOT
 
 # Map Epoch column names → Phase 1 schema names.
 COLUMN_MAP = {

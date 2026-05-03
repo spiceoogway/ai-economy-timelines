@@ -36,9 +36,11 @@ import numpy as np
 import pandas as pd
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-ASSUMPTIONS_PATH = REPO_ROOT / "data" / "assumptions" / "phase2_input_assumptions.yaml"
-SCENARIOS_DIR = REPO_ROOT / "scenarios"
+from model.runtime import (
+    ASSUMPTIONS_YAML as ASSUMPTIONS_PATH,
+    REPO_ROOT,
+    SCENARIOS_DIR,
+)
 
 SECONDS_PER_YEAR = 365.25 * 24 * 3600
 

@@ -1,9 +1,8 @@
-"""Phase 2 sprint-2 driver: sourced inputs + sensitivity + cost variants.
+"""Phase 2 driver: sourced inputs + sensitivity + cost variants.
 
-Run with: `uv run python notebooks/run_phase2_sprint2.py`
+Run with: `uv run phase2`
 
-Supersedes the sprint-1 driver. Produces all Phase 2 deliverables per
-docs/phase2_scope.md §7.
+Produces all Phase 2 deliverables per docs/phase2_scope.md §7.
 
 Outputs:
   data/processed/phase2_fundamental_inputs.csv
@@ -23,16 +22,10 @@ Outputs:
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.patches import Patch
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
 
 from model.fundamental_inputs import (
     CONSTRAINTS,
@@ -42,24 +35,14 @@ from model.fundamental_inputs import (
     project_scenario,
     sensitivity_analysis,
 )
-
-CHARTS_DIR = REPO_ROOT / "outputs" / "charts"
-TABLES_DIR = REPO_ROOT / "outputs" / "tables"
-PROCESSED_DIR = REPO_ROOT / "data" / "processed"
-PHASE1_TREND_TABLE = REPO_ROOT / "outputs" / "tables" / "phase1_trend_estimates.csv"
-
-SCENARIO_COLORS = {
-    "base_input_case": "tab:blue",
-    "capex_rich": "tab:green",
-    "chip_bottleneck": "tab:red",
-    "power_datacenter_bottleneck": "tab:orange",
-}
-CONSTRAINT_COLORS = {
-    "chip": "#d62728",
-    "power": "#ff7f0e",
-    "datacenter": "#9467bd",
-    "capex": "#2ca02c",
-}
+from model.runtime import (
+    CHARTS_DIR,
+    CONSTRAINT_COLORS,
+    PHASE1_TREND_TABLE,
+    PROCESSED_DIR,
+    SCENARIO_COLORS,
+    TABLES_DIR,
+)
 
 
 def get_phase1_rule_a_2018_fit() -> tuple[float, float, float]:
