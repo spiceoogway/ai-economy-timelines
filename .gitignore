@@ -12,3 +12,6 @@ wheels/
 # Excel lock files
 ~$*.xlsx
 ~$*.xls
+
+# MkDocs build output
+/site/

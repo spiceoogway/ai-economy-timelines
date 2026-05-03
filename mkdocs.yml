@@ -1,0 +1,96 @@
+site_name: AI Economy Timelines
+site_description: A scenario-based model of frontier AI compute (historical baseline → supply capacity → allocation → effective compute → capabilities).
+site_url: https://spiceoogway.github.io/ai-economy-timelines/
+repo_url: https://github.com/spiceoogway/ai-economy-timelines
+repo_name: spiceoogway/ai-economy-timelines
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
+
+nav:
+  - Home: index.md
+  - Start here:
+      - Executive summary: executive_summary.md
+      - Model map: model_map.md
+      - Model state: model_state.md
+      - Glossary: glossary.md
+  - Reading the outputs:
+      - Output guide: output_guide.md
+      - Model walkthrough: model_walkthrough.md
+      - Review workbook guide: review_workbook_guide.md
+      - Streamlit demo guide: streamlit_demo_guide.md
+  - Component memos:
+      - Historical findings: historical_findings.md
+      - Supply findings: supply_findings.md
+      - Allocation findings: allocation_findings.md
+      - Historical sprint notes: historical_initial_notes.md
+      - Supply sprint notes: supply_initial_notes.md
+      - Allocation sprint notes: allocation_initial_notes.md
+  - Reference:
+      - Scope: scope.md
+      - Component contracts: component_contracts.md
+      - Input provenance: input_provenance.md
+      - Data dictionary: data_dictionary.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/spiceoogway/ai-economy-timelines

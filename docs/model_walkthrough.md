@@ -93,7 +93,7 @@ input provenance is in [`input_provenance.md`](input_provenance.md).
 The Rule A 2018+ trend visualised against all historical models in the
 dataset:
 
-![Historical compute](../outputs/charts/historical_compute_over_time.png)
+![Historical compute](https://raw.githubusercontent.com/spiceoogway/ai-economy-timelines/main/outputs/charts/historical_compute_over_time.png)
 
 Reading notes:
 
@@ -115,7 +115,7 @@ timeline, three cost variants. All under `outputs/charts/historical_*.png`.
 
 The four scenarios visualised together:
 
-![Supply usable compute](../outputs/charts/supply_usable_compute_capacity.png)
+![Supply usable compute](https://raw.githubusercontent.com/spiceoogway/ai-economy-timelines/main/outputs/charts/supply_usable_compute_capacity.png)
 
 Reading notes:
 
@@ -128,7 +128,7 @@ Reading notes:
 
 Companion chart showing which constraint binds in each year:
 
-![Binding constraints](../outputs/charts/supply_binding_constraint_by_year.png)
+![Binding constraints](https://raw.githubusercontent.com/spiceoogway/ai-economy-timelines/main/outputs/charts/supply_binding_constraint_by_year.png)
 
 In the base and capex-rich scenarios, **capex** binds early then **chip**
 takes over; in the chip-bottleneck scenario, chip binds throughout; in
@@ -153,7 +153,7 @@ thing.
 The combined chart, with the historical fit overlaid on the four
 supply scenarios:
 
-![Supply vs historical](../outputs/charts/supply_vs_historical_compute_trend.png)
+![Supply vs historical](https://raw.githubusercontent.com/spiceoogway/ai-economy-timelines/main/outputs/charts/supply_vs_historical_compute_trend.png)
 
 The historical extrapolation (dashed black) is roughly **10 OOM** above
 even the most aggressive supply scenario by 2040. That gap is real and
