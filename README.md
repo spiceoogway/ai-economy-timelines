@@ -18,6 +18,7 @@ New readers should start with the orientation docs in `docs/`:
 6. [`docs/glossary.md`](docs/glossary.md) — definitions of core terms (frontier training run vs total usable compute, etc.).
 7. [`docs/component_contracts.md`](docs/component_contracts.md) — per-component inputs, outputs, and downstream consumers.
 8. [`docs/model_walkthrough.md`](docs/model_walkthrough.md) — guided tour through the actual outputs.
+9. [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md) — how to use the DuckDB review database and Excel workbook.
 
 Then:
 
@@ -42,16 +43,22 @@ uv sync
 ## Run
 
 ```bash
-uv run historical    # rebuild historical-baseline deliverables
-uv run supply        # rebuild supply-capacity deliverables
-uv run allocation    # rebuild allocation deliverables (requires supply first)
-uv run pytest        # run the test suite (21 tests)
+uv run historical          # rebuild historical-baseline deliverables
+uv run supply              # rebuild supply-capacity deliverables
+uv run allocation          # rebuild allocation deliverables (requires supply)
+uv run database            # build the DuckDB review database
+uv run workbook            # build the Excel review workbook
+uv run validate-outputs    # confirm every artifact is present + non-empty
+uv run pytest              # run the test suite (32 tests)
 ```
 
-All three pipelines write to `outputs/charts/` and `outputs/tables/`;
-processed datasets land in `data/processed/`. Allocation depends on
-the supply pipeline's output table — run `uv run supply` before
-`uv run allocation`.
+The first three pipelines produce `outputs/charts/`, `outputs/tables/`,
+and `data/processed/` artifacts. `uv run database` and `uv run workbook`
+are the institutional review layer — they consume those artifacts to
+produce a single DuckDB file (`outputs/database/ai_economy.duckdb`)
+and an 11-sheet Excel workbook (`outputs/workbooks/ai_economy_model_review.xlsx`).
+See [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md)
+for how to use them.
 
 ## Structure
 
@@ -92,13 +99,23 @@ pipelines/
   supply_charts.py          Supply chart helpers
   allocation.py             `uv run allocation` entry point
   allocation_charts.py      Allocation chart helpers
+model/
+  workbook_export.py        11-sheet Excel review workbook builder
+  review_database.py        DuckDB review-database builder (14 tables, 6 views)
+pipelines/
+  build_review_database.py  `uv run database` entry point
+  export_workbook.py        `uv run workbook` entry point
+  validate_repo_outputs.py  `uv run validate-outputs` entry point
 scenarios/
   supply_*.yaml             Four supply-side scenarios
   allocation_*.yaml         Four allocation scenarios
-tests/                      pytest suite
+tests/                      pytest suite (32 tests including output inventory)
 outputs/
-  charts/                   Final PNGs (historical_*, supply_*)
-  tables/                   Fitted-trend / capacity / sensitivity CSVs
+  charts/                   Final PNGs (historical_*, supply_*, allocation_*)
+  tables/                   Fitted-trend / capacity / allocation CSVs
+  database/                 ai_economy.duckdb + database_manifest.json
+  workbooks/                ai_economy_model_review.xlsx
+  runs/                     latest_run_manifest.json
 ```
 
 ## Historical-baseline headline (Rule A, 2018+)

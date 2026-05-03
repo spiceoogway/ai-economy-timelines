@@ -137,6 +137,44 @@ in `docs/allocation_findings.md` §8.
 
 ---
 
+## Review Layer (DuckDB + Excel Workbook)
+
+**Status:** ✓ built
+
+**Inputs:**
+- All `outputs/tables/*.csv` files (13 tables across historical / supply / allocation)
+- `data/assumptions/*.yaml` (for the sources_and_confidence flatten)
+- `data/processed/historical_models.csv` (loaded into DuckDB as the model-level reference table)
+
+**Transformation:**
+- Build a fresh DuckDB file with each table loaded as-is, plus a `combined_scenario_id` column added on the fly for any table that has supply_scenario + allocation_scenario columns
+- Flatten the supply + allocation YAMLs into a single `sources_and_confidence` table
+- Create 6 views (largest_run_2040_ranked, phase4_handoff, scenario_matrix, base_case_timeseries, slow_base_fast_envelope, sources_and_confidence)
+- Build an 11-sheet Excel workbook reading the same CSVs and YAMLs (no DuckDB dependency on the workbook side; both run independently)
+- Apply consistent styling: header row colors, autofilter, freeze panes, scientific-notation FLOP, percent shares, conditional formatting on confidence levels and scenario rankings
+
+**Outputs:**
+- `outputs/database/ai_economy.duckdb` (14 tables + 6 views)
+- `outputs/database/database_manifest.json` (schema version, git commit, row counts)
+- `outputs/workbooks/ai_economy_model_review.xlsx` (11 sheets)
+- `outputs/runs/latest_run_manifest.json` (after `uv run validate-outputs`)
+
+**Does not include:**
+- Manual edits — both artifacts are regenerated each run
+- New model logic — the review layer reads existing outputs only
+- Source-of-truth status — the upstream CSVs and YAMLs remain authoritative
+
+**Main uncertainty:** none modeling-side. Stale artifacts are the only
+real risk: if upstream CSVs change without a database/workbook rebuild,
+the review artifacts go out of sync. Mitigation: run `uv run validate-outputs`
+which captures the full state into a run manifest.
+
+**Downstream consumer:** human reviewers; the effective-compute layer
+will inherit the Phase 4 Handoff sheet / `v_phase4_handoff` view as its
+canonical input table.
+
+---
+
 ## Effective Compute Layer
 
 **Status:** ✗ future

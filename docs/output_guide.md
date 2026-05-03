@@ -344,6 +344,89 @@ other pipelines.
 
 ---
 
+## outputs/database/ai_economy.duckdb
+
+**What it is:** a single DuckDB file aggregating every output table
+plus a flattened sources_and_confidence table from the assumption
+YAMLs (14 tables, 6 SQL views).
+
+**Tables:** the 13 from above (historical_models /
+historical_trend_estimates / historical_hardware_summary /
+supply_fundamental_inputs_by_year / supply_scenario_summary /
+supply_binding_constraints / supply_capex_requirements /
+supply_sensitivity_analysis / allocation_compute_by_bucket /
+allocation_largest_frontier_run / allocation_scenario_summary /
+allocation_vs_historical_trend / allocation_share_assumptions_by_year)
+plus `sources_and_confidence` built from YAML.
+
+**Views:** `v_largest_run_2040_ranked`, `v_phase4_handoff`,
+`v_scenario_matrix`, `v_base_case_timeseries`,
+`v_slow_base_fast_envelope`, `v_sources_and_confidence`.
+
+**How to use it:** for ad-hoc SQL queries across multiple model
+components without writing pandas. Open in any DuckDB-compatible
+client (DBeaver, the DuckDB CLI, etc.) or query inline:
+
+```python
+import duckdb
+con = duckdb.connect("outputs/database/ai_economy.duckdb", read_only=True)
+con.execute("SELECT * FROM v_phase4_handoff WHERE year IN (2024, 2030, 2040)").fetchdf()
+```
+
+**What *not* to infer:** the database is a generated artifact.
+It can become stale if you edit a CSV without rerunning
+`uv run database`. Source of truth remains the upstream CSVs.
+
+**Downstream consumer:** the Excel workbook (which reads the
+underlying CSVs directly, not the DuckDB), and any ad-hoc analysis.
+
+---
+
+## outputs/workbooks/ai_economy_model_review.xlsx
+
+**What it is:** an 11-sheet Excel workbook generated from the
+output CSVs and assumption YAMLs. The institutional review
+artifact.
+
+**Sheets:** README, Model Flow, Scenario Matrix, Historical
+Baseline, Supply Capacity, Allocation Buckets, Largest Frontier
+Run, Phase 4 Handoff, Assumptions, Sources & Confidence, Output
+Inventory. See [`review_workbook_guide.md`](review_workbook_guide.md)
+for sheet-by-sheet documentation.
+
+**How to use it:** open in Excel / Numbers / LibreOffice. Sort
+and filter the tabular sheets; the Phase 4 Handoff sheet
+specifically formats slow / base / fast envelopes side-by-side
+for the effective-compute layer.
+
+**What *not* to infer:** **don't edit the workbook by hand**.
+Edits are wiped on the next regen. Edit the upstream YAMLs and
+rerun the pipelines instead.
+
+**Downstream consumer:** human reviewers; the effective-compute
+layer (Phase 4 Handoff sheet).
+
+---
+
+## outputs/runs/latest_run_manifest.json
+
+**What it is:** a small JSON file capturing the most recent
+`uv run validate-outputs` run. Contains run_timestamp, git_commit,
+python_version, pipelines_run list, output table list, output
+chart list, database path, workbook path, tests_passed bool, and
+total pass/fail counts.
+
+**How to use it:** as an audit trail. Captures what state the
+repo was in at the time of the last full validation pass.
+
+**What *not* to infer:** the manifest is overwritten on each
+`uv run validate-outputs`. For run history, see git log.
+
+**Downstream consumer:** none directly; useful for debugging
+"when did this artifact last regenerate cleanly?".
+
+---
+
 ## data/processed/supply_fundamental_inputs.csv
 
 **What it is:** identical content to

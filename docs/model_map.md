@@ -29,6 +29,7 @@ Everything beyond effective compute is deferred.
 | Historical baseline | ✓ built | `uv run historical` | `outputs/tables/historical_trend_estimates.csv` |
 | Supply capacity model | ✓ built | `uv run supply` | `outputs/tables/supply_fundamental_inputs_by_year.csv` |
 | Compute allocation | ✓ built | `uv run allocation` | `outputs/tables/allocation_largest_frontier_run.csv` |
+| Review layer (DuckDB + Excel) | ✓ built | `uv run database` / `uv run workbook` | `outputs/database/ai_economy.duckdb`, `outputs/workbooks/ai_economy_model_review.xlsx` |
 | Effective compute | ✗ next | — | — |
 | Capability mapping | ✗ future | — | — |
 | Probabilistic projections | ✗ future | — | — |
@@ -134,6 +135,8 @@ model/                     →  Reusable engine code
   historical_charts.py     (historical: chart helpers)
   supply_engine.py         (supply: H100-eq stock + 4 limits + utilization)
   allocation_engine.py     (allocation: 6 buckets + training-pool decomp)
+  review_database.py       (review: DuckDB build + 6 views)
+  workbook_export.py       (review: 11-sheet Excel)
                              (next: model/effective_compute_engine.py)
 ```
 

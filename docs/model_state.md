@@ -1,6 +1,6 @@
 # Model State
 
-**Last updated:** 2026-05-03 (allocation layer landed)
+**Last updated:** 2026-05-03 (review layer landed)
 
 ## Built
 
@@ -40,14 +40,29 @@
 - **Range across scenarios:** 14.1%/yr (chip_bottleneck × inference_heavy) to 48.1%/yr (capex_rich × training_race) CAGR; ~50× spread in absolute 2040 FLOP.
 - **Charts (6):** all under `outputs/charts/allocation_*.png`
 
+### Review layer (DuckDB + Excel workbook)
+
+- **Status:** complete
+- **Run commands:** `uv run database` (DuckDB, ~5 MB) and `uv run workbook` (Excel, ~110 KB)
+- **Main guide:** [`docs/review_workbook_guide.md`](review_workbook_guide.md)
+- **Outputs:**
+  - `outputs/database/ai_economy.duckdb` — 14 tables + 6 SQL views
+  - `outputs/database/database_manifest.json` — schema version + git commit + row counts
+  - `outputs/workbooks/ai_economy_model_review.xlsx` — 11 sheets (README, Model Flow, Scenario Matrix, Historical Baseline, Supply Capacity, Allocation Buckets, Largest Frontier Run, Phase 4 Handoff, Assumptions, Sources & Confidence, Output Inventory)
+  - `outputs/runs/latest_run_manifest.json` — run metadata + pass/fail counts
+- **Validation:** `uv run validate-outputs` walks the outputs tree and verifies every promised artifact exists and is non-empty (53 checks; current state 53/53 pass).
+
 ## Current run commands
 
 ```bash
-uv sync              # one-time setup (installs deps, registers entry points)
-uv run historical    # rebuild historical-baseline deliverables
-uv run supply        # rebuild supply-capacity deliverables
-uv run allocation    # rebuild allocation deliverables (requires supply first)
-uv run pytest        # run the test suite (21 tests)
+uv sync                    # one-time setup (installs deps, registers entry points)
+uv run historical          # rebuild historical-baseline deliverables
+uv run supply              # rebuild supply-capacity deliverables
+uv run allocation          # rebuild allocation deliverables (requires supply)
+uv run database            # build the DuckDB review database
+uv run workbook            # build the Excel review workbook
+uv run validate-outputs    # confirm artifacts present + non-empty
+uv run pytest              # run the test suite (32 tests)
 ```
 
 All three pipelines are idempotent — re-running them overwrites the
