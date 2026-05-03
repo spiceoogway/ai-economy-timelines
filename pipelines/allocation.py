@@ -30,10 +30,12 @@ from model.allocation_engine import (
     run_allocation_model,
 )
 from model.runtime import (
+    CHARTS_DIR,
     HISTORICAL_TREND_TABLE,
     PROCESSED_DIR,
     TABLES_DIR,
 )
+from pipelines import allocation_charts as charts
 
 
 def get_historical_rule_a_2018_fit() -> tuple[float, float, float]:
@@ -145,11 +147,32 @@ def main() -> None:
         "gap_ratio", "log10_gap",
     ]].to_csv(TABLES_DIR / "allocation_vs_historical_trend.csv", index=False)
 
-    print("[6/6] Writing share_assumptions_by_year + console summary...")
+    print("[6/6] Writing share_assumptions_by_year + 6 charts + console summary...")
     years = sorted(df["year"].unique())
     asm_long = interpolate_allocation_assumptions(assumptions, years)
     asm_long.to_csv(
         TABLES_DIR / "allocation_share_assumptions_by_year.csv", index=False
+    )
+
+    CHARTS_DIR.mkdir(parents=True, exist_ok=True)
+    charts.chart_compute_by_bucket(
+        df, CHARTS_DIR / "allocation_compute_by_bucket.png"
+    )
+    charts.chart_largest_frontier_run(
+        df, CHARTS_DIR / "allocation_largest_frontier_run.png"
+    )
+    charts.chart_vs_historical_training_compute(
+        vs_hist, historical_fit,
+        CHARTS_DIR / "allocation_vs_historical_training_compute.png",
+    )
+    charts.chart_training_vs_inference_share(
+        df, CHARTS_DIR / "allocation_training_vs_inference_share.png"
+    )
+    charts.chart_frontier_run_share_of_total(
+        df, CHARTS_DIR / "allocation_frontier_run_share_of_total.png"
+    )
+    charts.chart_scenario_grid(
+        df, CHARTS_DIR / "allocation_scenario_grid.png"
     )
 
     print("\n=== Allocation summary ===")
