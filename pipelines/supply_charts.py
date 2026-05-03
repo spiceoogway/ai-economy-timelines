@@ -1,13 +1,14 @@
-"""Phase 2 chart helpers.
+"""Supply-side chart helpers.
 
 One function per output PNG. Each helper takes the projection DataFrame
 (or a derivative), the list of scenarios, and an output path. Styling
 constants (colors, source line) come from `model.runtime`.
 
-Phase 1 charts live in `model/charts.py` — kept separate because P1
-charts consume the Epoch-models DataFrame on `release_year_fractional`
-while P2 charts consume the projection DataFrame on `year`. Different
-data shapes, different x-axes, different idioms.
+Historical-baseline charts live in `model/historical_charts.py` — kept
+separate because they consume the Epoch-models DataFrame on
+`release_year_fractional` while supply charts consume the projection
+DataFrame on `year`. Different data shapes, different x-axes,
+different idioms.
 """
 from __future__ import annotations
 
@@ -18,8 +19,8 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import Patch
 
-from model.fundamental_inputs import CONSTRAINTS, ScenarioConfig
 from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS
+from model.supply_engine import CONSTRAINTS, ScenarioConfig
 
 
 def _scenario_color(name: str) -> str:
@@ -43,7 +44,7 @@ def chart_accelerator_stock(
     ax.set_yscale("log")
     ax.set_xlabel("Year")
     ax.set_ylabel("Available installed stock (H100-eq, log scale)")
-    ax.set_title("Phase 2 — installed H100-equivalent stock by scenario, 2024–2040")
+    ax.set_title("Installed H100-equivalent stock by scenario, 2024–2040")
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="lower right", framealpha=0.9)
     fig.tight_layout()
@@ -77,7 +78,7 @@ def chart_theoretical_and_usable_compute(
         ax.set_title(title)
         ax.grid(True, which="both", alpha=0.25)
         ax.legend(loc="lower right", fontsize=9)
-    fig.suptitle("Phase 2 — annual AI compute capacity by scenario")
+    fig.suptitle("Annual AI compute capacity by scenario")
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -99,7 +100,7 @@ def chart_usable_compute_capacity(
     ax.set_xlabel("Year")
     ax.set_ylabel("Usable AI compute (FLOP / year, log scale)")
     ax.set_title(
-        "Phase 2 — usable AI compute capacity by scenario, 2024–2040 (sourced inputs)"
+        "Usable AI compute capacity by scenario, 2024–2040 (sourced inputs)"
     )
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="lower right", framealpha=0.9)
@@ -170,7 +171,7 @@ def chart_capex_required(
     ax.set_xlabel("Year")
     ax.set_ylabel("USD/year (log scale)")
     ax.set_title(
-        "Phase 2 — capex required (solid) vs assumed-available (dashed), by scenario"
+        "Capex required (solid) vs assumed-available (dashed), by scenario"
     )
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="lower right", fontsize=8)
@@ -207,15 +208,15 @@ def chart_binding_constraint_heatmap(
     plt.close(fig)
 
 
-def chart_vs_phase1_compute_trend(
+def chart_vs_historical_compute_trend(
     df: pd.DataFrame,
     scenarios: list[ScenarioConfig],
-    p1_fit: tuple[float, float, float],
+    historical_fit: tuple[float, float, float],
     years: list[int],
     out: Path,
 ) -> None:
-    """p1_fit is (slope_log10_per_year, intercept_log10, annual_multiplier)."""
-    slope, intercept, mult = p1_fit
+    """historical_fit is (slope_log10_per_year, intercept_log10, annual_multiplier)."""
+    slope, intercept, mult = historical_fit
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     # Left: absolute levels
@@ -226,19 +227,21 @@ def chart_vs_phase1_compute_trend(
             sub["year"], sub["usable_compute_flop_year"],
             marker="o", linewidth=2,
             color=_scenario_color(sc.name),
-            label=f"P2: {sc.display_name}",
+            label=f"supply: {sc.display_name}",
         )
-    p1_years = np.linspace(2018, 2040, 200)
-    p1_flop = 10 ** (intercept + slope * p1_years)
+    hist_years = np.linspace(2018, 2040, 200)
+    hist_flop = 10 ** (intercept + slope * hist_years)
     ax.plot(
-        p1_years, p1_flop,
+        hist_years, hist_flop,
         linestyle="--", color="black", linewidth=1.8,
-        label=f"P1 Rule A 2018+ frontier-run fit ({mult:.2f}×/yr)",
+        label=f"historical Rule A 2018+ frontier-run fit ({mult:.2f}×/yr)",
     )
     ax.set_yscale("log")
     ax.set_xlabel("Year")
     ax.set_ylabel("FLOP (log scale)")
-    ax.set_title("Absolute levels\nP2 = total annual usable · P1 = single frontier run")
+    ax.set_title(
+        "Absolute levels\nsupply = total annual usable · historical = single frontier run"
+    )
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="lower right", fontsize=8)
 
@@ -253,11 +256,11 @@ def chart_vs_phase1_compute_trend(
             color=_scenario_color(sc.name),
             label=sc.display_name,
         )
-    p1_norm = mult ** (np.array(years) - 2024)
+    hist_norm = mult ** (np.array(years) - 2024)
     ax.plot(
-        years, p1_norm,
+        years, hist_norm,
         linestyle="--", color="black", linewidth=1.8,
-        label=f"P1 frontier trend ({mult:.2f}×/yr)",
+        label=f"historical frontier trend ({mult:.2f}×/yr)",
     )
     ax.set_yscale("log")
     ax.set_xlabel("Year")
@@ -266,7 +269,7 @@ def chart_vs_phase1_compute_trend(
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="upper left", fontsize=8)
 
-    fig.suptitle("Phase 2 (sourced) input-derived compute vs Phase 1 historical trend")
+    fig.suptitle("Supply input-derived compute vs historical baseline trend")
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -300,8 +303,8 @@ def chart_cost_per_h100e_by_variant(df: pd.DataFrame, out: Path) -> None:
     ax.set_xlabel("Year")
     ax.set_ylabel("Cost per H100-eq per year (USD, log scale)")
     ax.set_title(
-        "Phase 2 — cost per H100-eq accelerator-year by cost variant\n"
-        "Preserves Phase 1 finding: cost-variant divergence is real and persistent"
+        "Cost per H100-eq accelerator-year by cost variant\n"
+        "Preserves historical-baseline finding: cost-variant divergence is real and persistent"
     )
     ax.grid(True, which="both", alpha=0.25)
     ax.legend(loc="upper right", fontsize=9)
@@ -332,8 +335,7 @@ def chart_sensitivity_bands(
         ax.legend(loc="lower right", fontsize=8)
     axes[0].set_ylabel("Usable compute (FLOP/yr, log)")
     fig.suptitle(
-        "Phase 2 — sensitivity of usable compute to one-parameter "
-        "perturbations of base scenario"
+        "Sensitivity of usable compute to one-parameter perturbations of base scenario"
     )
     fig.tight_layout()
     fig.savefig(out, dpi=150)

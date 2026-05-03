@@ -1,26 +1,25 @@
-"""Phase 1 driver: produce ALL Phase 1 deliverables in one run.
+"""Historical-baseline pipeline: produce all empirical-trend deliverables.
 
-Run with: `uv run phase1`
+Run with: `uv run historical`
 
 Produces:
-  data/processed/frontier_models_historical.{csv,parquet}
-  outputs/charts/frontier_training_compute_over_time.png
-  outputs/charts/frontier_training_cost_over_time.png
-  outputs/charts/cost_per_flop_over_time.png
-  outputs/charts/frontier_compute_by_organization.png
-  outputs/charts/frontier_cost_by_organization.png
-  outputs/charts/residuals_compute_trend.png
-  outputs/charts/residuals_cost_trend.png
-  outputs/charts/hardware_timeline.png
-  outputs/tables/phase1_trend_estimates.csv
-  outputs/tables/initial_compute_growth_estimates.csv  (kept for sprint-1 continuity)
-  outputs/tables/hardware_summary.csv
+  data/processed/historical_models.{csv,parquet}
+  outputs/charts/historical_compute_over_time.png
+  outputs/charts/historical_cost_over_time.png
+  outputs/charts/historical_cost_per_flop_over_time.png
+  outputs/charts/historical_compute_by_organization.png
+  outputs/charts/historical_cost_by_organization.png
+  outputs/charts/historical_residuals_compute.png
+  outputs/charts/historical_residuals_cost.png
+  outputs/charts/historical_hardware_timeline.png
+  outputs/tables/historical_trend_estimates.csv
+  outputs/tables/historical_hardware_summary.csv
 """
 from __future__ import annotations
 
 import pandas as pd
 
-from model import charts
+from model import historical_charts as charts
 from model.data_cleaning import load_raw, select_processed
 from model.frontier_filters import add_frontier_flags
 from model.runtime import CHARTS_DIR, PROCESSED_DIR, TABLES_DIR
@@ -104,8 +103,8 @@ def main() -> None:
     processed_cols = list(select_processed(df).columns) + RULES + ["frontier_any"]
     out = df[processed_cols].copy()
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    out.to_csv(PROCESSED_DIR / "frontier_models_historical.csv", index=False)
-    out.to_parquet(PROCESSED_DIR / "frontier_models_historical.parquet", index=False)
+    out.to_csv(PROCESSED_DIR / "historical_models.csv", index=False)
+    out.to_parquet(PROCESSED_DIR / "historical_models.parquet", index=False)
     print(f"      wrote {len(out):,} rows × {len(out.columns)} cols")
 
     full = out
@@ -143,20 +142,14 @@ def main() -> None:
 
     fits_df = fits_to_frame(all_fits)
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
-    fits_df.to_csv(TABLES_DIR / "phase1_trend_estimates.csv", index=False)
-    print(f"      wrote {len(fits_df)} trend rows to phase1_trend_estimates.csv")
-
-    # Also keep the sprint-1 file alive (just the compute rows).
-    fits_df[fits_df["trend_name"] == "training_compute"].to_csv(
-        TABLES_DIR / "initial_compute_growth_estimates.csv", index=False
-    )
+    fits_df.to_csv(TABLES_DIR / "historical_trend_estimates.csv", index=False)
+    print(f"      wrote {len(fits_df)} trend rows to historical_trend_estimates.csv")
 
     # Pull the headline fits we'll overlay on charts.
     def _by(rule: str, trend: str):
         m = (fits_df["frontier_rule"] == rule) & (fits_df["trend_name"] == trend)
         if not m.any():
             return None
-        # Find the corresponding TrendFit object.
         return next(
             f for f in all_fits
             if f is not None and f.frontier_rule == rule and f.trend_name == trend
@@ -169,21 +162,21 @@ def main() -> None:
     print("[5/8] Generating compute / cost / cost-per-FLOP charts...")
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
     charts.chart_compute_over_time(
-        out, compute_fit, CHARTS_DIR / "frontier_training_compute_over_time.png"
+        out, compute_fit, CHARTS_DIR / "historical_compute_over_time.png"
     )
     charts.chart_cost_over_time(
-        out, cost_fit, CHARTS_DIR / "frontier_training_cost_over_time.png"
+        out, cost_fit, CHARTS_DIR / "historical_cost_over_time.png"
     )
     charts.chart_cost_per_flop_over_time(
-        out, cpf_fit, CHARTS_DIR / "cost_per_flop_over_time.png"
+        out, cpf_fit, CHARTS_DIR / "historical_cost_per_flop_over_time.png"
     )
 
     print("[6/8] Generating by-organization charts...")
     charts.chart_compute_by_organization(
-        out, top_n_orgs=TOP_N_ORGS, out=CHARTS_DIR / "frontier_compute_by_organization.png"
+        out, top_n_orgs=TOP_N_ORGS, out=CHARTS_DIR / "historical_compute_by_organization.png"
     )
     charts.chart_cost_by_organization(
-        out, top_n_orgs=TOP_N_ORGS, out=CHARTS_DIR / "frontier_cost_by_organization.png"
+        out, top_n_orgs=TOP_N_ORGS, out=CHARTS_DIR / "historical_cost_by_organization.png"
     )
 
     print("[7/8] Generating residual diagnostic charts...")
@@ -193,7 +186,7 @@ def main() -> None:
             compute_fit,
             y_col="training_compute_flop",
             top_n_orgs=TOP_N_ORGS,
-            out=CHARTS_DIR / "residuals_compute_trend.png",
+            out=CHARTS_DIR / "historical_residuals_compute.png",
             title="training compute, Rule A 2018+",
         )
     if cost_fit is not None:
@@ -202,12 +195,12 @@ def main() -> None:
             cost_fit,
             y_col="estimated_training_cost_usd",
             top_n_orgs=TOP_N_ORGS,
-            out=CHARTS_DIR / "residuals_cost_trend.png",
+            out=CHARTS_DIR / "historical_residuals_cost.png",
             title="training cost, Rule A 2018+",
         )
 
     print("[8/8] Generating hardware timeline + summary table...")
-    charts.chart_hardware_timeline(out, CHARTS_DIR / "hardware_timeline.png")
+    charts.chart_hardware_timeline(out, CHARTS_DIR / "historical_hardware_timeline.png")
     hw = (
         out[out["frontier_any"]]
         .dropna(subset=["hardware_type"])
@@ -216,9 +209,9 @@ def main() -> None:
         .reset_index(name="n")
         .sort_values(["release_year", "n"], ascending=[True, False])
     )
-    hw.to_csv(TABLES_DIR / "hardware_summary.csv", index=False)
+    hw.to_csv(TABLES_DIR / "historical_hardware_summary.csv", index=False)
 
-    print("\nDone. Phase 1 artifacts written.")
+    print("\nDone. Historical-baseline artifacts written.")
     print("\n--- Headline (Rule A 2018+) ---")
     if compute_fit:
         print(f"  compute    : {compute_fit.annual_growth_multiplier:.2f}×/yr  doubling {compute_fit.doubling_time_years*12:.1f} mo  R²={compute_fit.r_squared:.2f}  n={compute_fit.n_models}")

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from model.fundamental_inputs import load_assumptions
+from model.supply_engine import load_assumptions
 
 
 def test_loader_returns_long_format(tmp_assumptions_yaml: Path) -> None:

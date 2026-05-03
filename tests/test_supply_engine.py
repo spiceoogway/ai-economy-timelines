@@ -1,11 +1,11 @@
-"""Tests for the Phase 2 fundamental-input model."""
+"""Tests for the supply-side compute-capacity engine."""
 from __future__ import annotations
 
 from pathlib import Path
 
 import pytest
 
-from model.fundamental_inputs import (
+from model.supply_engine import (
     CONSTRAINTS,
     ScenarioConfig,
     load_assumptions,

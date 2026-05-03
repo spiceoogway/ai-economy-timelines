@@ -15,8 +15,8 @@ dependencies = [
 ]
 
 [project.scripts]
-phase1 = "pipelines.phase1:main"
-phase2 = "pipelines.phase2:main"
+historical = "pipelines.historical:main"
+supply = "pipelines.supply:main"
 
 [dependency-groups]
 dev = [

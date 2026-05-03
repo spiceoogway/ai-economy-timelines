@@ -7,12 +7,12 @@ from __future__ import annotations
 
 import yaml
 
-from model.fundamental_inputs import CONSTRAINTS, SCENARIOS_DIR
 from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS
+from model.supply_engine import CONSTRAINTS, SCENARIOS_DIR
 
 
 def test_every_scenario_has_a_color() -> None:
-    scenario_yamls = sorted(SCENARIOS_DIR.glob("phase2_*.yaml"))
+    scenario_yamls = sorted(SCENARIOS_DIR.glob("supply_*.yaml"))
     assert scenario_yamls, "no scenario YAMLs found"
     for path in scenario_yamls:
         d = yaml.safe_load(path.read_text())

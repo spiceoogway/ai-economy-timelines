@@ -1,6 +1,6 @@
-"""Phase 2 fundamental-input compute capacity model.
+"""Supply-side compute-capacity engine.
 
-Pipeline (per docs/phase2_scope.md §4):
+Pipeline (per docs/scope.md):
 
     accelerator_shipments_t
         ↓ (with retirement)
@@ -20,11 +20,10 @@ The four limits (chip / power / dc / capex) are computed independently in
 H100-equivalent units, then we take the minimum and record the binding
 constraint per year.
 
-Sprint 1: round-number placeholder assumptions live in
-data/assumptions/phase2_input_assumptions.csv (long format, scenario-keyed,
-linearly interpolated between milestone years). All numbers flagged
-confidence=low source=placeholder until sprint 2 replaces them with cited
-figures.
+Assumptions live in data/assumptions/supply_input_assumptions.yaml
+(long format, scenario-keyed, linearly interpolated between milestone
+years). Per-row source / confidence flags carry forward; see
+docs/supply_findings.md for the full provenance.
 """
 from __future__ import annotations
 
@@ -358,7 +357,7 @@ def sensitivity_analysis(
 
 
 def load_all_scenarios() -> list[ScenarioConfig]:
-    paths = sorted(SCENARIOS_DIR.glob("phase2_*.yaml"))
+    paths = sorted(SCENARIOS_DIR.glob("supply_*.yaml"))
     return [ScenarioConfig.from_yaml(p) for p in paths]
 
 

@@ -19,7 +19,7 @@ def tmp_assumptions_yaml(tmp_path: Path) -> Path:
     """Minimal but complete assumptions YAML covering one scenario.
 
     Includes every parameter that project_scenario() pulls so that
-    fundamental_inputs tests can run a real projection on synthetic data.
+    supply_engine tests can run a real projection on synthetic data.
     """
     data = {
         "h100_equivalent_shipments": {
