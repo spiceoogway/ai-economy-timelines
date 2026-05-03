@@ -8,3 +8,7 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Excel lock files
+~$*.xlsx
+~$*.xls
