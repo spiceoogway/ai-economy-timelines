@@ -1,39 +1,54 @@
 # ai-economy-timelines
 
-A scenario-based model of frontier AI compute. Three components shipped, effective compute is next.
+A scenario-based model of frontier AI compute. Five components shipped, effective compute is next.
 
 - **Historical baseline** — empirical compute & spend baseline for frontier models, derived from the [Epoch AI](https://epoch.ai) "Notable AI Models" dataset. Log-linear fits, frontier-rule sensitivity, residual diagnostics.
 - **Supply capacity model** — forward compute-capacity projection 2024–2040: H100-equivalent shipments, installed stock with retirement, power / data-center / capex constraints, utilization derating, binding-constraint identification across four scenarios.
 - **Allocation layer** — splits total usable compute into 6 buckets (inference, training, AI R&D, post-training, safety/eval, reserved), decomposes the training pool into the largest single frontier run, and produces `largest_frontier_run_flop_by_year` across the 4 × 4 = 16 supply × allocation combined-scenario cross-product.
+- **Review layer** — generated DuckDB review database (14 tables, 6 views) and 11-sheet Excel review workbook for SQL queries and at-a-glance review.
+- **Scenario explorer** — read-only Streamlit app on top of the DuckDB; 9 pages covering overview, scenario matrix, supply, allocation, largest run, effective-compute handoff, assumptions, provenance, and run manifest.
 
 ## How to read this repo
 
-New readers should start with the orientation docs in `docs/`:
+The docs are organized into four named groups. Read in order if you're new to the project; jump directly if you're looking for something specific.
+
+### A. Start here
 
 1. [`docs/executive_summary.md`](docs/executive_summary.md) — plain-English summary, headline numbers, what's built, what's next.
 2. [`docs/model_map.md`](docs/model_map.md) — full model architecture and data flow with diagrams.
 3. [`docs/model_state.md`](docs/model_state.md) — what's built vs not built, run commands, output table.
-4. [`docs/output_guide.md`](docs/output_guide.md) — what each output file means and how to interpret it.
-5. [`docs/input_provenance.md`](docs/input_provenance.md) — where every input comes from, with confidence flags.
-6. [`docs/glossary.md`](docs/glossary.md) — definitions of core terms (frontier training run vs total usable compute, etc.).
-7. [`docs/component_contracts.md`](docs/component_contracts.md) — per-component inputs, outputs, and downstream consumers.
-8. [`docs/model_walkthrough.md`](docs/model_walkthrough.md) — guided tour through the actual outputs.
-9. [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md) — how to use the DuckDB review database and Excel workbook.
-10. [`docs/streamlit_demo_guide.md`](docs/streamlit_demo_guide.md) — how to launch and use the interactive scenario explorer.
+4. [`docs/glossary.md`](docs/glossary.md) — definitions of core terms (frontier training run vs total usable compute, etc.).
 
-Then:
+### B. Reading the outputs
+
+5. [`docs/output_guide.md`](docs/output_guide.md) — what each output file means and how to interpret it.
+6. [`docs/model_walkthrough.md`](docs/model_walkthrough.md) — guided tour through the actual outputs.
+7. [`docs/review_workbook_guide.md`](docs/review_workbook_guide.md) — how to use the DuckDB review database and Excel workbook.
+8. [`docs/streamlit_demo_guide.md`](docs/streamlit_demo_guide.md) — how to launch and use the interactive scenario explorer.
+
+### C. Per-component memos
 
 9. [`docs/historical_findings.md`](docs/historical_findings.md) — historical-baseline final memo.
 10. [`docs/supply_findings.md`](docs/supply_findings.md) — supply-capacity final memo + allocation-layer handoff.
-11. [`docs/scope.md`](docs/scope.md) — merged scope for both components.
+11. [`docs/allocation_findings.md`](docs/allocation_findings.md) — allocation-layer final memo + effective-compute handoff.
+12. [`docs/historical_initial_notes.md`](docs/historical_initial_notes.md) — sprint-1 working notes for the historical baseline.
+13. [`docs/supply_initial_notes.md`](docs/supply_initial_notes.md) — sprint-1 working notes for the supply capacity model.
+14. [`docs/allocation_initial_notes.md`](docs/allocation_initial_notes.md) — sprint-1 working notes for the allocation layer.
+
+### D. Reference
+
+15. [`docs/scope.md`](docs/scope.md) — merged scope for the historical, supply, and allocation components.
+16. [`docs/component_contracts.md`](docs/component_contracts.md) — per-component inputs, outputs, and downstream consumers.
+17. [`docs/input_provenance.md`](docs/input_provenance.md) — where every input comes from, with confidence flags.
+18. [`docs/data_dictionary.md`](docs/data_dictionary.md) — historical-baseline column-level schema and source-to-column mappings.
 
 ## Most important caution
 
 > The supply-capacity model estimates **total annual usable AI compute**.
-> It does **not** estimate the **largest frontier training run** yet.
-> That is the purpose of the next layer (compute allocation).
+> The allocation layer maps that to **largest frontier training run**.
+> Treating the historical 5.97×/yr frontier-run trend as a forecast of total compute, or treating supply / allocation projections as forecasts of single-run scaling without the bridging share parameters, is the most common reading mistake.
 
-Treating the historical 5.97×/yr frontier-run trend as a forecast of total compute, or treating the supply-capacity 45.7%/yr CAGR as a forecast of single-run scaling, is the most common reading mistake. See the executive summary for the full framing.
+See the executive summary for the full framing.
 
 ## Setup
 
@@ -68,27 +83,14 @@ how to use them.
 
 ```
 data/
-  raw/                 Raw Epoch CSVs (immutable)
-  processed/           Cleaned datasets; outputs of historical/supply pipelines
+  raw/                      Raw Epoch CSVs (immutable)
+  processed/                Cleaned datasets; outputs of the upstream pipelines
   assumptions/
-    supply_input_assumptions.yaml    Single source of truth for supply-capacity inputs
-docs/
-  executive_summary.md      Plain-English summary
-  model_map.md              Architecture + data flow
-  model_state.md            What's built / not built
-  output_guide.md           Output-file interpretation
-  input_provenance.md       Where inputs come from
-  glossary.md               Core terms
-  component_contracts.md    Per-component inputs/outputs
-  model_walkthrough.md      Guided walkthrough of actual outputs
-  scope.md                  Merged scope for both components
-  historical_findings.md    Historical-baseline final memo
-  historical_initial_notes.md
-  supply_findings.md        Supply-capacity final memo
-  supply_initial_notes.md
-  data_dictionary.md
+    supply_input_assumptions.yaml      Single source of truth for supply-capacity inputs
+    allocation_input_assumptions.yaml  Single source of truth for allocation inputs
+docs/                       Markdown documentation (see "How to read" above)
   assets/
-    model_architecture.png  Polished architecture diagram
+    model_architecture.png  Regenerable architecture diagram
 model/
   runtime.py                Shared paths, color maps, source-line strings
   data_cleaning.py          Historical raw-data normalization
@@ -97,16 +99,14 @@ model/
   historical_charts.py      Historical chart helpers
   supply_engine.py          Supply-side compute-capacity engine
   allocation_engine.py      Allocation engine (buckets + training-pool decomp)
+  review_database.py        DuckDB review-database builder (14 tables, 6 views)
+  workbook_export.py        11-sheet Excel review workbook builder
 pipelines/
   historical.py             `uv run historical` entry point
   supply.py                 `uv run supply` entry point
   supply_charts.py          Supply chart helpers
   allocation.py             `uv run allocation` entry point
   allocation_charts.py      Allocation chart helpers
-model/
-  workbook_export.py        11-sheet Excel review workbook builder
-  review_database.py        DuckDB review-database builder (14 tables, 6 views)
-pipelines/
   build_review_database.py  `uv run database` entry point
   export_workbook.py        `uv run workbook` entry point
   validate_repo_outputs.py  `uv run validate-outputs` entry point
@@ -137,7 +137,7 @@ outputs/
 | Training cost (2023 USD) | 4.89× | 5.2 mo | 0.72 | 74 |
 | Cost per FLOP | 0.76× (~24%/yr decline) | — | 0.21 | 74 |
 
-Full memo: `docs/historical_findings.md`.
+Full memo: [`docs/historical_findings.md`](docs/historical_findings.md).
 
 ## Supply-capacity headline (sourced base case)
 
@@ -148,7 +148,7 @@ Full memo: `docs/historical_findings.md`.
 | Chip-constrained | 3.83e+28 | 6.54e+30 | 37.9%/yr | chip |
 | Power/DC-constrained | 3.50e+28 | 6.64e+30 | 38.8%/yr | datacenter |
 
-Full memo + allocation-layer handoff: `docs/supply_findings.md`.
+Full memo + allocation-layer handoff: [`docs/supply_findings.md`](docs/supply_findings.md).
 
 ## Allocation headline (largest frontier training run)
 
@@ -167,4 +167,4 @@ of 5.97×/yr passes through the allocation envelope around 2027–2028
 and reaches ~1e+37 FLOP by 2040 — a ~7 OOM gap that the
 effective-compute layer will partly address.
 
-Full memo + effective-compute handoff: `docs/allocation_findings.md`.
+Full memo + effective-compute handoff: [`docs/allocation_findings.md`](docs/allocation_findings.md).
