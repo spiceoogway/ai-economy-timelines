@@ -93,35 +93,45 @@ hyperscaler capex as AI infrastructure post-2025) is a close second.
 
 ## Compute Allocation Layer
 
-**Status:** ✗ next
+**Status:** ✓ built
 
-**Inputs (proposed):**
-- `outputs/tables/supply_fundamental_inputs_by_year.csv` (annual usable compute by scenario)
-- `outputs/tables/historical_trend_estimates.csv` (calibration target)
-- `data/assumptions/allocation_input_assumptions.yaml` (new; allocation shares + largest-run concentration)
-- `scenarios/allocation_*.yaml` (new; allocation scenarios)
+**Inputs:**
+- `outputs/tables/supply_fundamental_inputs_by_year.csv` (annual usable compute by scenario; produced by `uv run supply`)
+- `outputs/tables/historical_trend_estimates.csv` (used for the historical-comparison overlay; rebased to 1e25 FLOP at 2024)
+- `data/assumptions/allocation_input_assumptions.yaml` (4 scenarios × milestone years × 9 parameters)
+- `scenarios/allocation_*.yaml` (4 registration files)
 
-**Transformation (proposed):**
-- Split annual `usable_compute_flop_year` into training / inference / AI R&D experiments / post-training / reserves shares
-- Within the training slice, model the largest-run concentration (fraction of training compute that goes to the single largest run)
-- Combine: `largest_frontier_run_flop = usable_compute × training_share × largest_run_concentration`
-- Calibrate against historical Rule A 2018+ trend (the model should reproduce the historical 5.97×/yr in the 2018–2024 backcast)
+**Transformation:**
+- Linearly interpolate milestone assumptions between years
+- Cross supply scenarios with allocation scenarios (4 × 4 = 16 combined)
+- Validate that the 6 bucket shares sum to 1.0 (±1e-6) for every row
+- Allocate: `bucket_compute = usable_compute × bucket_share` for each of the 6 buckets
+- Decompose: `frontier_lab_training_compute = training_compute × frontier_lab_training_share`
+- Estimate: `largest_frontier_run_flop = frontier_lab_training_compute × largest_run_concentration × cluster_contiguity_factor`
+- Compare: project the historical Rule A 2018+ extrapolation alongside; emit `gap_ratio` per row
 
-**Outputs (proposed):**
-- `outputs/tables/allocation_by_year.csv` — training / inference / R&D / post-training / reserves shares per scenario per year
-- `outputs/tables/largest_frontier_run_flop_by_year.csv` — **the headline output**, single-frontier-run FLOP per scenario per year, comparable directly with the historical-baseline trend
-- Charts under `outputs/charts/allocation_*.png`
+**Outputs:**
+- `data/processed/allocation_compute_by_bucket.csv`
+- `outputs/tables/allocation_compute_by_bucket.csv` (272 rows × ~24 cols)
+- `outputs/tables/allocation_largest_frontier_run.csv`
+- `outputs/tables/allocation_scenario_summary.csv` (16 rows)
+- `outputs/tables/allocation_vs_historical_trend.csv`
+- `outputs/tables/allocation_share_assumptions_by_year.csv`
+- 6 charts under `outputs/charts/allocation_*.png`
 
-**Does not include (proposed):**
-- Effective compute (algorithmic adjustment)
+**Does not include:**
+- Effective-compute adjustment (algorithmic efficiency, data quality, architectural improvements)
 - Capability forecasting
 - Per-organization or per-lab allocation
+- Geographic split
+- Quarterly grain
 
-**Main uncertainty (anticipated):** the largest-run concentration
-parameter. Historical estimates put it at 5–15% of frontier-lab
-compute, but the absolute fraction of *global* compute is harder to
-pin down. Sensitivity to this parameter is roughly linear in the
-output.
+**Main uncertainty:** the `largest_run_concentration` parameter
+(currently 0.05–0.20 across scenarios, all `confidence: medium`).
+A swing within plausible range (0.10 → 0.20) changes 2040
+largest_run by 2× linearly. Second is `frontier_lab_training_share`
+(0.50–0.70 across scenarios). Both unsourced; flagged for refinement
+in `docs/allocation_findings.md` §8.
 
 **Downstream consumer:** the effective-compute layer.
 

@@ -1,10 +1,12 @@
 # Project Scope
 
-This is the merged scope for the project: a **historical baseline** of
-frontier AI training compute and cost (from Epoch's Notable AI Models
-dataset) and a **supply-side compute-capacity model** projecting
-2024–2040 under multiple scenarios. Future components (allocation,
-effective compute, capability) will be added in their own sections
+This is the merged scope for the project. Three sections, three built
+components: a **historical baseline** of frontier AI training compute
+and cost (Epoch's Notable AI Models dataset), a **supply-side
+compute-capacity model** projecting 2024–2040 across multiple
+scenarios, and an **allocation layer** that splits supply into
+buckets and produces single-frontier-run projections. Future
+components (effective compute, capability mapping) will be added
 when they land.
 
 The historical baseline is the empirical input layer for the supply
@@ -890,3 +892,99 @@ Annual usable AI compute capacity by scenario through 2040.
 Primary handoff to the allocation layer:
 A scenario-indexed compute capacity envelope that can be allocated across training, inference, AI R&D experiments, post-training, and reserves.
 ```
+
+---
+
+# Section 3 — Compute Allocation Layer
+
+## Objective
+
+Build the allocation layer that converts total annual usable AI compute capacity (the supply capacity model's output) into compute assigned to specific uses: inference, training, AI R&D experiments, post-training, safety/evals, and reserved/idle/fragmented capacity.
+
+The most important output is `largest_frontier_run_flop_by_year` — the first forward-looking quantity directly comparable with the historical baseline's frontier training-run trend.
+
+## Core research questions
+
+1. What share of total usable AI compute goes to inference?
+2. What share goes to training?
+3. What share goes to AI R&D experiments?
+4. What share goes to post-training, safety, and evaluations?
+5. What share is reserved, idle, fragmented, or otherwise unavailable?
+6. Within training compute, what share goes to the largest frontier run?
+7. How does largest-run concentration change over time?
+8. Can allocation dynamics explain the historical frontier-run growth trend?
+9. How do allocation choices differ across supply scenarios?
+10. What raw frontier-run compute envelope should the effective-compute layer inherit?
+
+## In scope
+
+- Six allocation buckets with shares summing to 1.0 (inference / training / ai_rnd_experiment / post_training / safety_eval / reserved_idle_fragmented).
+- Training-pool decomposition into largest_frontier_run / other_frontier_training / non_frontier_training via three multipliers (`frontier_lab_training_share`, `largest_run_concentration`, `cluster_contiguity_factor`).
+- Four allocation scenarios (`allocation_base`, `allocation_inference_heavy`, `allocation_training_race`, `allocation_rnd_acceleration`).
+- 4 supply × 4 allocation = **16 combined scenarios** in the cross-product output.
+- Historical-comparison table + chart against the Rule A 2018+ extrapolation.
+
+## Out of scope
+
+Effective compute · algorithmic efficiency · data efficiency · capability forecasting · task-horizon modeling · benchmark prediction · AI R&D automation feedback · recursive improvement · revenue forecasting · macroeconomic productivity · labor automation · policy response modeling · full cluster topology modeling · company-level ownership modeling · quarterly modeling.
+
+## Architecture
+
+```
+supply usable compute by year
+        ↓
+allocation shares by scenario
+        ↓
+compute by bucket
+        ↓
+training pool
+        ↓
+frontier-lab training pool
+        ↓
+largest frontier training run    ← headline output
+        ↓
+historical comparison
+        ↓
+effective-compute layer handoff
+```
+
+Core equations:
+
+```
+training_compute_t = usable_compute_t × training_share_t
+inference_compute_t = usable_compute_t × inference_share_t
+ai_rnd_experiment_compute_t = usable_compute_t × ai_rnd_experiment_share_t
+frontier_lab_training_compute_t = training_compute_t × frontier_lab_training_share_t
+largest_frontier_run_flop_t =
+    frontier_lab_training_compute_t
+  × largest_run_concentration_t
+  × cluster_contiguity_factor_t
+```
+
+## Deliverables
+
+- `data/assumptions/allocation_input_assumptions.yaml`
+- `model/allocation_engine.py`
+- `pipelines/allocation.py` + `pipelines/allocation_charts.py`
+- `scenarios/allocation_*.yaml` (four files)
+- 6 charts under `outputs/charts/allocation_*.png`
+- 5 tables under `outputs/tables/allocation_*.csv`
+- `docs/allocation_initial_notes.md` and `docs/allocation_findings.md`
+- `tests/test_allocation_engine.py` (8 invariant tests)
+
+Run command: `uv run allocation` (requires `uv run supply` to have produced the supply outputs first).
+
+## Acceptance criteria
+
+The allocation layer is complete when:
+
+1. `uv run allocation` runs and produces all required artifacts.
+2. Allocation assumptions are stored in an auditable YAML file.
+3. Supply scenarios are crossed with allocation scenarios (4 × 4 = 16).
+4. Total usable compute is split into major buckets by year.
+5. Training compute is decomposed into largest frontier run, other frontier training, and non-frontier training.
+6. The largest frontier training run is estimated by year and scenario.
+7. Historical frontier-run compute is compared against allocation-derived projections.
+8. Charts and tables are exported.
+9. A findings memo documents assumptions, uncertainties, and effective-compute-layer handoff parameters.
+10. Tests validate allocation-share and compute-flow invariants.

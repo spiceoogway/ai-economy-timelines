@@ -8,7 +8,7 @@ deferred, and how data flows between them.
 ```mermaid
 flowchart TD
     H[Historical Baseline<br/>Epoch model data<br/>BUILT] --> C[Comparison / Calibration Target]
-    S[Supply Capacity<br/>chips + power + data centers + capex + utilization<br/>BUILT] --> A[Compute Allocation<br/>NEXT]
+    S[Supply Capacity<br/>chips + power + data centers + capex + utilization<br/>BUILT] --> A[Compute Allocation<br/>BUILT]
     C --> A
     A --> E[Effective Compute<br/>FUTURE]
     E --> K[Capability Mapping<br/>FUTURE]
@@ -16,10 +16,11 @@ flowchart TD
     P --> F[AI Economy Feedback<br/>FUTURE]
 ```
 
-Two boxes are **built** today (historical baseline and supply-capacity model).
-The next layer is **compute allocation**, which bridges the gap between the
-two and emits the missing quantity: `largest_frontier_run_flop_by_year`.
-Everything beyond allocation is deferred.
+Three boxes are **built** today: historical baseline, supply-capacity
+model, and the allocation layer (which emits `largest_frontier_run_flop_by_year`,
+the bridging quantity). The next layer is **effective compute**, which
+adjusts raw frontier-run FLOP for algorithmic-efficiency gains.
+Everything beyond effective compute is deferred.
 
 ## 2. Built vs next vs future
 
@@ -27,8 +28,8 @@ Everything beyond allocation is deferred.
 |---|---|---|---|
 | Historical baseline | ✓ built | `uv run historical` | `outputs/tables/historical_trend_estimates.csv` |
 | Supply capacity model | ✓ built | `uv run supply` | `outputs/tables/supply_fundamental_inputs_by_year.csv` |
-| Compute allocation | ✗ next | — | (`largest_frontier_run_flop_by_year`, planned) |
-| Effective compute | ✗ future | — | — |
+| Compute allocation | ✓ built | `uv run allocation` | `outputs/tables/allocation_largest_frontier_run.csv` |
+| Effective compute | ✗ next | — | — |
 | Capability mapping | ✗ future | — | — |
 | Probabilistic projections | ✗ future | — | — |
 | Economy feedback | ✗ future | — | — |
@@ -85,35 +86,35 @@ can outpace total-supply growth for a while without contradiction.
 > **Supply capacity model = all global usable AI compute.**
 > **They are not directly comparable as forecasts.**
 
-## 5. Why the allocation layer is next
+## 5. The allocation layer (now built)
 
-The historical baseline gave us "frontier runs grew at X×/yr." The supply
-model gives us "total usable compute will grow at Y%/yr." Bridging these
-requires modeling the *share* of total usable compute that goes to the
-largest single training run.
+The allocation layer splits annual usable compute across:
 
-The allocation layer must split annual usable compute across:
-
-- **Training** (including the largest single frontier run, plus smaller runs)
+- **Training** (further decomposed into largest single frontier run, other frontier-lab training, and non-frontier training)
 - **Inference** (production serving)
-- **AI R&D experiments** (post-training, evals, ablations, safety)
-- **Reserves** (unallocated / fragmented capacity)
+- **AI R&D experiments** (ablations, scaling-law sweeps, post-training research)
+- **Post-training** (RLHF, fine-tuning passes)
+- **Safety / evals**
+- **Reserved / idle / fragmented**
 
-Once the largest-frontier-run share is modeled, the supply-capacity model's
-trajectory can be translated into a forward frontier-run trajectory and
-compared apples-to-apples with the historical trend.
+Run via `uv run allocation`; full memo at [`allocation_findings.md`](allocation_findings.md).
 
-The expected primary output of the allocation layer is:
+The headline output is `largest_frontier_run_flop_by_year`, the
+bridge between the supply model's total-annual-compute trend and the
+historical baseline's single-frontier-run trend. The allocation pipeline
+also produces `allocation_vs_historical_trend.csv` quantifying the
+year-by-year gap between projections and the historical extrapolation.
 
-```text
-largest_frontier_run_flop_by_year
-```
-
-This is the bridge between the supply model's total-annual-compute trend
-and the historical baseline's single-frontier-run trend. Until allocation
-is built, the gap between historical 5.97×/yr and supply ~50%/yr CAGR
-cannot be reconciled — and any forecast that treats the historical trend
-as a forecast of total compute (or vice versa) is wrong.
+**Headline finding:** under base supply × base allocation, the
+largest frontier run grows at 27.6%/yr CAGR 2024→2040, reaching
+~6.9e+28 FLOP by 2040. The historical Rule A 2018+ extrapolation
+of 5.97×/yr (~497% CAGR) reaches ~1e+37 FLOP by 2040 — a **~7 OOM
+gap** that no combination of supply + allocation reproduces. Three
+honest readings (the historical trend was already slowing, allocation
+parameters may be conservative, and supply fundamentals genuinely
+cap single-run growth) all probably contribute. The effective-compute
+layer (next) may close some of this by adjusting for algorithmic
+efficiency gains.
 
 ---
 
@@ -122,7 +123,8 @@ as a forecast of total compute (or vice versa) is wrong.
 ```
 pipelines/historical.py    →  Builds historical-baseline outputs
 pipelines/supply.py        →  Builds supply-capacity outputs
-                             (next: pipelines/allocation.py)
+pipelines/allocation.py    →  Builds allocation outputs (depends on supply)
+                             (next: pipelines/effective_compute.py)
 
 model/                     →  Reusable engine code
   runtime.py               (shared paths, colors, attribution)
@@ -131,7 +133,8 @@ model/                     →  Reusable engine code
   trend_fitting.py         (historical: log-linear fits)
   historical_charts.py     (historical: chart helpers)
   supply_engine.py         (supply: H100-eq stock + 4 limits + utilization)
-                             (next: model/allocation_engine.py)
+  allocation_engine.py     (allocation: 6 buckets + training-pool decomp)
+                             (next: model/effective_compute_engine.py)
 ```
 
 Inputs live in `data/raw/` (immutable) and `data/assumptions/`

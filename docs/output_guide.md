@@ -215,6 +215,135 @@ allocation layers.
 
 ---
 
+## outputs/tables/allocation_compute_by_bucket.csv
+
+**What it is:** the allocation pipeline's primary output — annual
+compute allocation across the 6 buckets, with training-pool
+decomposition, for every (supply, allocation) combination. 16
+combined scenarios × 17 years = 272 rows × ~24 columns.
+
+**Main columns:**
+- `year`, `supply_scenario`, `allocation_scenario`, `combined_scenario`
+- `usable_compute_flop_year` (carried from supply)
+- 6 bucket shares (sum to 1) and 6 corresponding `*_compute_flop_year` values
+- `frontier_lab_training_share`, `largest_run_concentration`, `cluster_contiguity_factor`
+- `frontier_lab_training_compute_flop_year`
+- **`largest_frontier_run_flop`** — the headline quantity
+- `frontier_run_share_of_total_compute`
+- `binding_constraint` (carried from supply)
+
+**How to use it:** as the input to the (yet-to-be-built) effective-
+compute layer. For any allocation-derived statement, pull the
+appropriate (combined_scenario, year) row.
+
+**What *not* to infer:** these are *raw* FLOP numbers. They have
+not been adjusted for algorithmic efficiency, data quality, or
+architectural improvements. Treating two FLOP numbers from
+different years as equivalent capability is wrong; that's what
+the effective-compute layer exists to fix.
+
+**Downstream consumer:** the effective-compute layer.
+
+---
+
+## outputs/tables/allocation_largest_frontier_run.csv
+
+**What it is:** a slimmer view of the allocation output focused on
+the headline quantity. 272 rows.
+
+**Main columns:** `year`, `supply_scenario`, `allocation_scenario`,
+`combined_scenario`, `largest_frontier_run_flop`,
+`frontier_run_share_of_total_compute`,
+`training_compute_flop_year`,
+`frontier_lab_training_compute_flop_year`.
+
+**How to use it:** the cleanest single source for forward
+single-frontier-run-FLOP statements. Comparable apples-to-apples
+with the historical Rule A 2018+ trend (after rebasing the
+historical intercept to 1e25 FLOP at 2024).
+
+**What *not* to infer:** the same caveat as `allocation_compute_by_bucket.csv`
+applies — raw FLOP, not effective FLOP.
+
+**Downstream consumer:** historical-comparison chart; the
+effective-compute layer.
+
+---
+
+## outputs/tables/allocation_scenario_summary.csv
+
+**What it is:** per-combined-scenario milestone summary at 2024 /
+2030 / 2040, plus 16-year CAGRs. 16 rows.
+
+**Main columns:** `combined_scenario`, `supply_scenario`,
+`allocation_scenario`, `usable_compute_{2024,2030,2040}`,
+`largest_run_{2024,2030,2040}`, `largest_run_cagr_2024_2040`,
+`frontier_run_share_{2024,2030,2040}`.
+
+**How to use it:** quick-comparison table for memos and
+presentations. Sorted by 2040 largest_run gives a clear
+"which combination produces the biggest single run" ranking.
+
+**What *not* to infer:** the milestone subset hides non-monotonic
+behavior. Use `allocation_compute_by_bucket.csv` for the
+year-by-year detail.
+
+**Downstream consumer:** memo authoring; not consumed by other
+pipelines.
+
+---
+
+## outputs/tables/allocation_vs_historical_trend.csv
+
+**What it is:** year-by-year gap between allocation-derived
+single-frontier-run projections and the historical Rule A 2018+
+extrapolation. 272 rows (one per combined_scenario × year).
+
+**Main columns:** `year`, `scenario` (the combined name),
+`supply_scenario`, `allocation_scenario`,
+`historical_trend_frontier_run_flop` (extrapolation rebased to 1e25
+at 2024), `projected_largest_frontier_run_flop`, `gap_ratio`,
+`log10_gap`.
+
+**How to use it:** to quantify the gap between the historical-trend
+extrapolation and the allocation-derived forward projection. By 2040
+the historical extrapolation reaches ~1e+37 vs realistic
+projections ~1e+28-29, giving log10_gap of ~8-9 OOM.
+
+**What *not* to infer:** **the historical extrapolation is not a
+forecast.** It's a descriptive fit on 2018–2024 data. The "gap" is
+the joint effect of (a) the historical trend already slowing,
+(b) allocation parameters possibly being conservative, and
+(c) supply fundamentals genuinely capping single-run growth.
+
+**Downstream consumer:** the effective-compute layer (calibration
+target — does adjusting for algorithmic efficiency close the gap?).
+
+---
+
+## outputs/tables/allocation_share_assumptions_by_year.csv
+
+**What it is:** the linearly-interpolated allocation parameters by
+year. Audit trail showing what shares the model used between
+milestones. 4 scenarios × 17 years = 68 rows.
+
+**Main columns:** `allocation_scenario`, `year`, plus all 9
+allocation parameters.
+
+**How to use it:** to verify what the model assumed in any given
+year, especially between milestones. Bucket shares should sum to
+1.0 within tolerance for every row (enforced by tests).
+
+**What *not* to infer:** these are *interpolated* values; the
+underlying milestones are at 2024 / 2030 / 2040 only, with linear
+interpolation between. A non-linear trajectory between milestones
+would require additional milestones.
+
+**Downstream consumer:** internal validation; not consumed by
+other pipelines.
+
+---
+
 ## data/processed/supply_fundamental_inputs.csv
 
 **What it is:** identical content to

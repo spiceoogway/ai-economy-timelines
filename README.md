@@ -1,9 +1,10 @@
 # ai-economy-timelines
 
-A scenario-based model of frontier AI compute. Two components shipped, allocation is next.
+A scenario-based model of frontier AI compute. Three components shipped, effective compute is next.
 
 - **Historical baseline** — empirical compute & spend baseline for frontier models, derived from the [Epoch AI](https://epoch.ai) "Notable AI Models" dataset. Log-linear fits, frontier-rule sensitivity, residual diagnostics.
 - **Supply capacity model** — forward compute-capacity projection 2024–2040: H100-equivalent shipments, installed stock with retirement, power / data-center / capex constraints, utilization derating, binding-constraint identification across four scenarios.
+- **Allocation layer** — splits total usable compute into 6 buckets (inference, training, AI R&D, post-training, safety/eval, reserved), decomposes the training pool into the largest single frontier run, and produces `largest_frontier_run_flop_by_year` across the 4 × 4 = 16 supply × allocation combined-scenario cross-product.
 
 ## How to read this repo
 
@@ -43,11 +44,14 @@ uv sync
 ```bash
 uv run historical    # rebuild historical-baseline deliverables
 uv run supply        # rebuild supply-capacity deliverables
-uv run pytest        # run the test suite
+uv run allocation    # rebuild allocation deliverables (requires supply first)
+uv run pytest        # run the test suite (21 tests)
 ```
 
-Both pipelines write to `outputs/charts/` and `outputs/tables/`; processed
-datasets land in `data/processed/`.
+All three pipelines write to `outputs/charts/` and `outputs/tables/`;
+processed datasets land in `data/processed/`. Allocation depends on
+the supply pipeline's output table — run `uv run supply` before
+`uv run allocation`.
 
 ## Structure
 
@@ -81,12 +85,16 @@ model/
   trend_fitting.py          Historical log-linear fits
   historical_charts.py      Historical chart helpers
   supply_engine.py          Supply-side compute-capacity engine
+  allocation_engine.py      Allocation engine (buckets + training-pool decomp)
 pipelines/
   historical.py             `uv run historical` entry point
   supply.py                 `uv run supply` entry point
   supply_charts.py          Supply chart helpers
+  allocation.py             `uv run allocation` entry point
+  allocation_charts.py      Allocation chart helpers
 scenarios/
   supply_*.yaml             Four supply-side scenarios
+  allocation_*.yaml         Four allocation scenarios
 tests/                      pytest suite
 outputs/
   charts/                   Final PNGs (historical_*, supply_*)
@@ -113,3 +121,22 @@ Full memo: `docs/historical_findings.md`.
 | Power/DC-constrained | 3.50e+28 | 6.64e+30 | 38.8%/yr | datacenter |
 
 Full memo + allocation-layer handoff: `docs/supply_findings.md`.
+
+## Allocation headline (largest frontier training run)
+
+Combined supply × allocation scenarios (4 × 4 = 16). Top and bottom of the
+range:
+
+| Combined scenario | 2024 | 2040 | CAGR |
+|---|---|---|---|
+| capex_rich × training_race (fast) | 1.74e+27 | 9.38e+29 | **48.1%/yr** |
+| **base × base (headline)** | **1.39e+27** | **6.93e+28** | **27.6%/yr** |
+| chip_bottleneck × inference_heavy (slow) | 9.52e+26 | 7.84e+27 | 14.1%/yr |
+
+Frontier-run share of total compute *falls* in every scenario (3.5% in
+2024 → <1% in most by 2040). The historical Rule A 2018+ extrapolation
+of 5.97×/yr passes through the allocation envelope around 2027–2028
+and reaches ~1e+37 FLOP by 2040 — a ~7 OOM gap that the
+effective-compute layer will partly address.
+
+Full memo + effective-compute handoff: `docs/allocation_findings.md`.
