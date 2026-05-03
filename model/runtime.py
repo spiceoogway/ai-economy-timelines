@@ -44,6 +44,17 @@ SCENARIO_COLORS = {
     "power_datacenter_bottleneck": "tab:orange",
 }
 
+# Distinct markers per scenario so overlapping series remain readable when
+# scenarios share a parameter trajectory (e.g. base and chip_bottleneck
+# share `ai_datacenter_capacity_mw`; base / chip_bottleneck /
+# power_datacenter_bottleneck share `ai_infrastructure_capex_usd`).
+SCENARIO_MARKERS = {
+    "base_input_case": "o",
+    "capex_rich": "s",
+    "chip_bottleneck": "^",
+    "power_datacenter_bottleneck": "D",
+}
+
 # Supply binding-constraint categories. Keys must match the entries in
 # supply_engine.CONSTRAINTS.
 CONSTRAINT_COLORS = {

@@ -19,12 +19,50 @@ import numpy as np
 import pandas as pd
 from matplotlib.patches import Patch
 
-from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS
+from model.runtime import CONSTRAINT_COLORS, SCENARIO_COLORS, SCENARIO_MARKERS
 from model.supply_engine import CONSTRAINTS, ScenarioConfig
+
+# Slight transparency on supply line plots so overlapping scenarios still
+# read as distinct visually.
+_LINE_ALPHA = 0.85
 
 
 def _scenario_color(name: str) -> str:
     return SCENARIO_COLORS.get(name, "grey")
+
+
+def _scenario_marker(name: str) -> str:
+    return SCENARIO_MARKERS.get(name, "o")
+
+
+def _detect_overlapping_scenarios(
+    df: pd.DataFrame, scenarios: list[ScenarioConfig], value_col: str
+) -> list[list[str]]:
+    """Return groups of scenario names that share an identical trajectory in
+    `value_col`. Used to annotate charts when scenarios overplot."""
+    groups: dict[tuple, list[str]] = {}
+    for sc in scenarios:
+        sub = df[df["scenario"] == sc.name].sort_values("year")
+        traj = tuple(sub[value_col].round(6).values)
+        groups.setdefault(traj, []).append(sc.display_name)
+    return [g for g in groups.values() if len(g) > 1]
+
+
+def _annotate_overlap(ax, overlap_groups: list[list[str]]) -> None:
+    """If any scenarios share trajectories, add a small text annotation."""
+    if not overlap_groups:
+        return
+    lines = ["Note: scenarios with identical trajectories:"]
+    for grp in overlap_groups:
+        lines.append("  " + " = ".join(grp))
+    ax.text(
+        0.02, 0.98, "\n".join(lines),
+        transform=ax.transAxes,
+        ha="left", va="top",
+        fontsize=7.5, color="#444",
+        bbox=dict(boxstyle="round,pad=0.3",
+                  facecolor="white", edgecolor="#bbb", alpha=0.9),
+    )
 
 
 def chart_accelerator_stock(
@@ -36,8 +74,9 @@ def chart_accelerator_stock(
         ax.plot(
             sub["year"],
             sub["available_stock_h100e"],
-            marker="o",
+            marker=_scenario_marker(sc.name),
             linewidth=2,
+            alpha=_LINE_ALPHA,
             color=_scenario_color(sc.name),
             label=sc.display_name,
         )
@@ -59,13 +98,14 @@ def chart_theoretical_and_usable_compute(
     for sc in scenarios:
         sub = df[df["scenario"] == sc.name]
         c = _scenario_color(sc.name)
+        m = _scenario_marker(sc.name)
         axes[0].plot(
             sub["year"], sub["theoretical_compute_flop_year"],
-            marker="o", linewidth=2, color=c, label=sc.display_name,
+            marker=m, linewidth=2, alpha=_LINE_ALPHA, color=c, label=sc.display_name,
         )
         axes[1].plot(
             sub["year"], sub["usable_compute_flop_year"],
-            marker="o", linewidth=2, color=c, label=sc.display_name,
+            marker=m, linewidth=2, alpha=_LINE_ALPHA, color=c, label=sc.display_name,
         )
     titles = [
         "Theoretical (chip stock × peak FLOP × s)",
@@ -92,7 +132,8 @@ def chart_usable_compute_capacity(
         sub = df[df["scenario"] == sc.name]
         ax.plot(
             sub["year"], sub["usable_compute_flop_year"],
-            marker="o", linewidth=2,
+            marker=_scenario_marker(sc.name), linewidth=2,
+            alpha=_LINE_ALPHA,
             color=_scenario_color(sc.name),
             label=sc.display_name,
         )
@@ -118,7 +159,8 @@ def chart_power_capacity_constraint(
         c = _scenario_color(sc.name)
         axes[0].plot(
             sub["year"], sub["ai_power_capacity_mw"],
-            marker="o", linewidth=2, color=c, label=sc.display_name,
+            marker=_scenario_marker(sc.name), linewidth=2, alpha=_LINE_ALPHA,
+            color=c, label=sc.display_name,
         )
     axes[0].set_yscale("log")
     axes[0].set_xlabel("Year")
@@ -126,13 +168,17 @@ def chart_power_capacity_constraint(
     axes[0].set_title("AI-DC installed power capacity")
     axes[0].grid(True, which="both", alpha=0.25)
     axes[0].legend(loc="lower right", fontsize=9)
+    _annotate_overlap(
+        axes[0], _detect_overlapping_scenarios(df, scenarios, "ai_power_capacity_mw")
+    )
 
     for sc in scenarios:
         sub = df[df["scenario"] == sc.name]
         c = _scenario_color(sc.name)
+        m = _scenario_marker(sc.name)
         axes[1].plot(
             sub["year"], sub["power_limited_stock_h100e"],
-            marker="o", linewidth=2, color=c,
+            marker=m, linewidth=2, alpha=_LINE_ALPHA, color=c,
             label=f"{sc.display_name} — power-lim",
         )
         axes[1].plot(
@@ -158,14 +204,16 @@ def chart_capex_required(
     for sc in scenarios:
         sub = capex_df[capex_df["scenario"] == sc.name]
         c = _scenario_color(sc.name)
+        m = _scenario_marker(sc.name)
         ax.plot(
             sub["year"], sub["capex_required_usd"],
-            marker="o", linewidth=2, color=c,
+            marker=m, linewidth=2, alpha=_LINE_ALPHA, color=c,
             label=f"{sc.display_name} — required",
         )
         ax.plot(
             sub["year"], sub["capex_available_usd"],
-            marker="x", linewidth=1, alpha=0.5, color=c, linestyle="--",
+            marker=m, linewidth=1, alpha=0.55, color=c, linestyle="--",
+            label=f"{sc.display_name} — available",
         )
     ax.set_yscale("log")
     ax.set_xlabel("Year")
@@ -174,7 +222,10 @@ def chart_capex_required(
         "Capex required (solid) vs assumed-available (dashed), by scenario"
     )
     ax.grid(True, which="both", alpha=0.25)
-    ax.legend(loc="lower right", fontsize=8)
+    ax.legend(loc="lower right", fontsize=7, ncol=2)
+    _annotate_overlap(
+        ax, _detect_overlapping_scenarios(capex_df, scenarios, "capex_available_usd")
+    )
     fig.tight_layout()
     fig.savefig(out, dpi=150)
     plt.close(fig)
@@ -225,7 +276,8 @@ def chart_vs_historical_compute_trend(
         sub = df[df["scenario"] == sc.name]
         ax.plot(
             sub["year"], sub["usable_compute_flop_year"],
-            marker="o", linewidth=2,
+            marker=_scenario_marker(sc.name), linewidth=2,
+            alpha=_LINE_ALPHA,
             color=_scenario_color(sc.name),
             label=f"supply: {sc.display_name}",
         )
@@ -252,7 +304,8 @@ def chart_vs_historical_compute_trend(
         norm = sub["usable_compute_flop_year"] / sub.loc[2024, "usable_compute_flop_year"]
         ax.plot(
             norm.index, norm.values,
-            marker="o", linewidth=2,
+            marker=_scenario_marker(sc.name), linewidth=2,
+            alpha=_LINE_ALPHA,
             color=_scenario_color(sc.name),
             label=sc.display_name,
         )
