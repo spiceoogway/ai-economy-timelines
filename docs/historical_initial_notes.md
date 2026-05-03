@@ -1,4 +1,4 @@
-# Phase 1 — Sprint 1 Initial Notes
+# Historical Baseline — Sprint 1 Initial Notes
 
 **Date:** 2026-05-02
 **Sprint goal:** first working historical baseline of frontier training compute.
@@ -8,8 +8,8 @@
 - Repo + Python env scaffolded (`uv`, `pandas`, `numpy`, `statsmodels`, `matplotlib`).
 - Raw Epoch CSVs pulled to `data/raw/`.
 - Cleaning + frontier-flagging + log-linear fitting modules in `model/`.
-- Processed dataset at `data/processed/frontier_models_historical.{csv,parquet}` (1,011 rows × 35 cols).
-- First chart: `outputs/charts/frontier_training_compute_over_time.png`.
+- Processed dataset at `data/processed/historical_models.{csv,parquet}` (1,011 rows × 35 cols).
+- First chart: `outputs/charts/historical_compute_over_time.png`.
 - First trend table: `outputs/tables/initial_compute_growth_estimates.csv`.
 
 ## Data quality observations
@@ -49,7 +49,7 @@ From `outputs/tables/initial_compute_growth_estimates.csv`:
    on FLOP ≥ 1e23 you have already truncated the lower tail, so the
    remaining variation through time is much smaller.
 2. **Rule A 2018+ has the cleanest fit (R²=0.84) and the most defensible
-   reading.** Headline candidate for the Phase 2 base case: ~6× per year,
+   reading.** Headline candidate for the supply base case: ~6× per year,
    doubling every ~5 months.
 
 ## Outliers / weird cases worth investigating
@@ -75,18 +75,18 @@ In rough priority order:
 2. **Cost-per-FLOP trend.** Should be strongly negative. Hardware-era
    diagnostics (V100 vs A100 vs H100/Blackwell era).
 3. **Residual diagnostics by year and by organization.**
-   `outputs/charts/residuals_compute_trend.png`,
-   `outputs/charts/residuals_cost_trend.png`.
+   `outputs/charts/historical_residuals_compute.png`,
+   `outputs/charts/historical_residuals_cost.png`.
 4. **Organization-level breakouts** —
-   `outputs/charts/frontier_compute_by_organization.png` and
-   `outputs/charts/frontier_cost_by_organization.png`.
+   `outputs/charts/historical_compute_by_organization.png` and
+   `outputs/charts/historical_cost_by_organization.png`.
 5. **Hardware / cluster descriptive timeline** (no model, just charts +
    tables).
-6. **Final memo** `docs/phase1_findings.md` with explicit Phase 2
+6. **Final memo** `docs/historical_findings.md` with explicit the supply capacity model
    handoff parameters (base / fast / slow compute and cost growth
    assumptions, recommended historical window, recommended frontier rule).
 
-## Open questions for Phase 1
+## Open questions for the historical baseline
 
 - **Should Rule A use a top-N percentile rather than a fixed N?** Top-10
   picks up smaller frontier sets in 2010 and oversamples them in 2024
@@ -99,11 +99,11 @@ In rough priority order:
   prices, which is what cluster-builders actually paid. Decision to be
   documented in the cost-trend sprint.
 - **Pre-2018 data inclusion**: keep as a separate "long-run" comparison
-  fit; do not mix into the Phase 2 base case.
+  fit; do not mix into the supply base case.
 
-## Recommended (provisional) Phase 2 inputs
+## Recommended (provisional) supply capacity model inputs
 
-These are not final — final values will live in `phase1_findings.md` once
+These are not final — final values will live in `historical_findings.md` once
 the cost and residual sprints are complete. Provisional from sprint 1:
 
 - Recommended historical window: **2018-01-01 to last full quarter of data**.

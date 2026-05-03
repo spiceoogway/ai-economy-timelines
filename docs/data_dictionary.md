@@ -13,13 +13,13 @@ Two additional Epoch CSVs are pulled for cross-checks but not used directly:
 - `data/raw/epoch_large_scale_ai_models_raw.csv` (large-scale subset)
 
 The raw CSV has 1,011 model rows (47 columns) covering 1950–2026. The
-processed dataset (`data/processed/frontier_models_historical.{csv,parquet}`)
+processed dataset (`data/processed/historical_models.{csv,parquet}`)
 preserves all 1,011 rows with the columns documented below plus the three
 frontier flags.
 
 ## Field definitions
 
-| Phase 1 column | Source column | Type | Notes |
+| Column | Source column | Type | Notes |
 |---|---|---|---|
 | `model_id` | derived | string | `"<model_name> \| <organization> \| <date>"` |
 | `model_name` | `Model` | string | unchanged |
@@ -73,12 +73,12 @@ encode very different assumptions about hardware utilization and amortization.
 
 ### Cost per FLOP
 `estimated_training_cost_usd / training_compute_flop`. Sensitive to which
-of the three cost variants is used — Phase 1 uses the headline 2023-USD
+of the three cost variants is used — The historical baseline uses the headline 2023-USD
 figure for trend fits, with sensitivity tests against the other two
 deferred to a later sprint.
 
 ### Frontier model
-There is no neutral definition. Phase 1 uses **three** independent rules
+There is no neutral definition. The historical baseline uses **three** independent rules
 plus Epoch's own flag for cross-comparison:
 
 - **Rule A (top-10 in window)**: among the highest-compute models released
@@ -96,7 +96,7 @@ Trend-rate sensitivity to rule choice is one of the central diagnostics.
 Epoch's `Confidence` column rates how well-substantiated the compute
 estimate is. We map it as:
 
-| Epoch | Phase 1 |
+| Epoch | Historical baseline |
 |---|---|
 | Confident | high |
 | Likely | medium |

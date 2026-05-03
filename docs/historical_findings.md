@@ -1,8 +1,8 @@
-# Phase 1 Findings — Historical Compute & Spend Baseline
+# Historical Baseline — Findings
 
 **Author:** automated analysis pipeline
 **Date:** 2026-05-02
-**Status:** Phase 1 complete. Phase 2 handoff parameters at the bottom.
+**Status:** Historical baseline complete. Supply-capacity handoff parameters at the bottom.
 
 ---
 
@@ -21,7 +21,7 @@ In plain English: from 2018 through early 2026, frontier training runs grew
 by roughly **6× per year in raw compute** and **5× per year in inflation-
 adjusted dollars**, while the **price per training FLOP fell ~24%/yr**.
 
-The single most important Phase 1 caveat is that these numbers are
+The single most important historical-baseline caveat is that these numbers are
 **moderately sensitive to frontier definition and very sensitive to cost
 variant.** Sections 6–8 quantify both.
 
@@ -37,9 +37,9 @@ variant.** Sections 6–8 quantify both.
   Epoch's own frontier subset is replicated in our `epoch_frontier_flag`
   column).
 - **Local snapshot:** `data/raw/epoch_*.csv` (immutable).
-- **Processed dataset:** `data/processed/frontier_models_historical.{csv,parquet}` (1,011 rows × 35 cols).
+- **Processed dataset:** `data/processed/historical_models.{csv,parquet}` (1,011 rows × 35 cols).
 
-Mappings from Epoch column names to Phase 1 schema names: `docs/data_dictionary.md`.
+Mappings from Epoch column names to historical-baseline schema names: `docs/data_dictionary.md`.
 
 ---
 
@@ -76,7 +76,7 @@ its slope estimate and its R².
 
 ## 5. Historical compute trend
 
-Full table: `outputs/tables/phase1_trend_estimates.csv`. Compute rows below.
+Full table: `outputs/tables/historical_trend_estimates.csv`. Compute rows below.
 
 | Window | Rule | n | ×/yr | Doubling (mo) | R² |
 |---|---|---|---|---|---|
@@ -92,7 +92,7 @@ Full table: `outputs/tables/phase1_trend_estimates.csv`. Compute rows below.
 **Headline reading:** the modern (2018+) frontier-compute trend is **~6×
 per year** under Rule A or B and converges with the all-models trend. The
 long-run trend (1950–2026) is **~2× per year**. The two regimes are real and
-visible in the chart `outputs/charts/frontier_training_compute_over_time.png`.
+visible in the chart `outputs/charts/historical_compute_over_time.png`.
 
 Rule C's 2× answer for 2018+ is a **selection artifact** rather than a
 disagreement — once you require ≥1e23 FLOP, the bottom of the post-2018
@@ -118,9 +118,9 @@ fit is even cleaner (R² = 0.91) at **~3.3× per year**, doubling ~7 months.
 
 Note the spread: 3× to 5×. We'll treat ~4× as the central estimate.
 
-Chart: `outputs/charts/frontier_training_cost_over_time.png`.
+Chart: `outputs/charts/historical_cost_over_time.png`.
 
-### Cost variant sensitivity (Phase 1 critical finding)
+### Cost variant sensitivity (historical-baseline critical finding)
 
 Epoch publishes three cost columns. Under **Rule A 2018+**, the same
 trend looks very different depending on which one you fit:
@@ -142,7 +142,7 @@ figure.** This is not noise — it is a real divergence:
 - **Headline 2023 USD** is Epoch's blended figure, closest to cloud-rental
   but with broader coverage.
 
-For Phase 2 we recommend carrying **all three** cost variants forward, with
+For the supply capacity model we recommend carrying **all three** cost variants forward, with
 the headline 2023-USD figure as the base case and explicit fast/slow bounds
 that reflect cost-variant disagreement.
 
@@ -162,10 +162,10 @@ cuts of the data. R² is materially lower than for compute or cost in
 isolation — unsurprising, because cost-per-FLOP combines the noise of two
 already-uncertain estimates and the dataset thins to ~50–100 rows.
 
-The Phase 1 base estimate is **~25%/yr decline (0.75×/yr)** for the modern
+The historical base estimate is **~25%/yr decline (0.75×/yr)** for the modern
 window, with bounds at ~12% and ~30% reflecting the rule sensitivity.
 
-Chart: `outputs/charts/cost_per_flop_over_time.png`.
+Chart: `outputs/charts/historical_cost_per_flop_over_time.png`.
 
 ---
 
@@ -174,7 +174,7 @@ Chart: `outputs/charts/cost_per_flop_over_time.png`.
 1. **Cost variant divergence (largest single uncertainty).** Same models,
    same window, same regression — but the implied annual cost-growth
    multiplier ranges 2.5× → 4.9× depending on which cost column you use.
-   Phase 2 must not silently average these.
+   the supply capacity model must not silently average these.
 2. **Cost coverage is thin.** 74 frontier-rule-A rows have headline cost,
    only 22–27 have the more hardware-grounded variants. Late 2025 / 2026
    are particularly sparse.
@@ -189,19 +189,19 @@ Chart: `outputs/charts/cost_per_flop_over_time.png`.
 6. **Organization-level structure.** The residual-by-org chart shows
    OpenAI, Google, Meta, DeepMind, NVIDIA, and xAI sit consistently above
    the trend line under Rule A 2018+; Alibaba, Anthropic, Google Brain
-   sit below. Phase 2 should not assume one global rate fits all labs.
+   sit below. the supply capacity model should not assume one global rate fits all labs.
 7. **Long-tail pre-1990 data.** Including pre-deep-learning systems pulls
    the long-run slope down. The two-regime (slow until ~2010, fast after)
    structure is visible in every chart and is one of the cleaner findings
    in this dataset.
 8. **Hardware quality / cluster scale data is too sparse for a model.**
    199 frontier rows with accelerator counts and 204 with training duration
-   give a credible *descriptive* timeline (`outputs/charts/hardware_timeline.png`)
+   give a credible *descriptive* timeline (`outputs/charts/historical_hardware_timeline.png`)
    but not enough for a reliable multivariate fit yet.
 
 ---
 
-## 9. Recommended assumptions for Phase 2
+## 9. Recommended assumptions for the supply capacity model
 
 These are the explicit handoff parameters. Each is a recommendation, not
 a forecast — the corresponding fast/slow bounds are intentionally wide
@@ -230,7 +230,7 @@ Recommended frontier definition:          Rule A (top-10 at release)
 
 - Cost-variant divergence (2.5× ↔ 4.9×) is wider than rule-choice divergence
   and is **not** captured by quoting a single 2023-USD figure with a CI.
-  Phase 2 must explicitly track at least the cloud and upfront variants in
+  the supply capacity model must explicitly track at least the cloud and upfront variants in
   parallel.
 - The cost-per-FLOP fit is the noisiest of the three trends (R² = 0.21
   under the headline rule). Treat its central estimate as ±10 percentage
@@ -239,7 +239,7 @@ Recommended frontier definition:          Rule A (top-10 at release)
   for months. Re-fitting in Q3 2026 should tighten the modern-window
   slopes and may revise the headline numbers slightly upward (reporting
   bias historically favors high-compute systems).
-- Organization-level residual structure is **not** modeled. Phase 2 may
+- Organization-level residual structure is **not** modeled. the supply capacity model may
   need lab-level effects rather than a single global rate.
 
 ---
@@ -252,7 +252,7 @@ Recommended frontier definition:          Rule A (top-10 at release)
 2. Should the fits be **WLS** with `Confidence` as inverse variance? Likely
    small effect, but worth confirming.
 3. Should we collect **non-Epoch** cost figures (lab disclosures, hardware
-   purchase reports, public cloud pricing) as a Phase 1.5 cross-check on
+   purchase reports, public cloud pricing) as a follow-up cross-check on
    the cost-variant divergence?
 4. Do we need a **separate "training compute including post-training"**
    trend? RLHF/RLAIF and inference-time scaling are now non-negligible and
@@ -268,17 +268,17 @@ Recommended frontier definition:          Rule A (top-10 at release)
 
 | Spec deliverable | File | Status |
 |---|---|---|
-| Clean dataset (parquet) | `data/processed/frontier_models_historical.parquet` | ✓ |
-| Clean dataset (CSV) | `data/processed/frontier_models_historical.csv` | ✓ |
+| Clean dataset (parquet) | `data/processed/historical_models.parquet` | ✓ |
+| Clean dataset (CSV) | `data/processed/historical_models.csv` | ✓ |
 | Data dictionary | `docs/data_dictionary.md` | ✓ |
-| Compute over time | `outputs/charts/frontier_training_compute_over_time.png` | ✓ |
-| Cost over time | `outputs/charts/frontier_training_cost_over_time.png` | ✓ |
-| Cost per FLOP | `outputs/charts/cost_per_flop_over_time.png` | ✓ |
-| Compute by organization | `outputs/charts/frontier_compute_by_organization.png` | ✓ |
-| Cost by organization | `outputs/charts/frontier_cost_by_organization.png` | ✓ |
-| Residuals (compute) | `outputs/charts/residuals_compute_trend.png` | ✓ |
-| Residuals (cost) | `outputs/charts/residuals_cost_trend.png` | ✓ |
-| Hardware timeline | `outputs/charts/hardware_timeline.png` | ✓ (bonus) |
-| Trend estimates table | `outputs/tables/phase1_trend_estimates.csv` | ✓ (45 rows) |
-| Hardware summary | `outputs/tables/hardware_summary.csv` | ✓ (bonus) |
-| Phase 1 memo | `docs/phase1_findings.md` | ✓ (this file) |
+| Compute over time | `outputs/charts/historical_compute_over_time.png` | ✓ |
+| Cost over time | `outputs/charts/historical_cost_over_time.png` | ✓ |
+| Cost per FLOP | `outputs/charts/historical_cost_per_flop_over_time.png` | ✓ |
+| Compute by organization | `outputs/charts/historical_compute_by_organization.png` | ✓ |
+| Cost by organization | `outputs/charts/historical_cost_by_organization.png` | ✓ |
+| Residuals (compute) | `outputs/charts/historical_residuals_compute.png` | ✓ |
+| Residuals (cost) | `outputs/charts/historical_residuals_cost.png` | ✓ |
+| Hardware timeline | `outputs/charts/historical_hardware_timeline.png` | ✓ (bonus) |
+| Trend estimates table | `outputs/tables/historical_trend_estimates.csv` | ✓ (45 rows) |
+| Hardware summary | `outputs/tables/historical_hardware_summary.csv` | ✓ (bonus) |
+| historical-baseline memo | `docs/historical_findings.md` | ✓ (this file) |

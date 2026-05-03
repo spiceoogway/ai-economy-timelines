@@ -1,9 +1,9 @@
-# Phase 2 Findings — Fundamental Input Compute-Capacity Model
+# Supply Capacity Model — Findings
 
 **Author:** automated analysis pipeline
 **Date:** 2026-05-03
-**Status:** Phase 2 complete (sprint 1 skeleton + sprint 2 sourced inputs).
-Phase 3 handoff parameters at the bottom.
+**Status:** supply capacity model complete (sprint 1 skeleton + sprint 2 sourced inputs).
+allocation-layer handoff parameters at the bottom.
 
 ---
 
@@ -13,20 +13,20 @@ Under sourced base-case assumptions, **global usable AI compute capacity
 grows ~46%/yr from 2024 through 2040**, hitting ~1.7e+31 FLOP/year by
 2040 — about three orders of magnitude above 2024. The binding
 constraint is capex through 2036, then chips for the remainder. None of
-the four scenarios reproduces the Phase 1 historical Rule A 2018+ rate
+the four scenarios reproduces the historical Rule A 2018+ rate
 of 5.97×/yr (~497% CAGR); the gap remains roughly 10 orders of
 magnitude by 2040.
 
-Three honest readings of the Phase 1 vs Phase 2 gap:
+Three honest readings of the historical-vs-supply gap:
 
-1. **Phase 1's compute trend is single-frontier-run growth, not aggregate
+1. **the historical compute trend is single-frontier-run growth, not aggregate
    supply growth.** The two diverge if (and only if) frontier runs use a
    growing share of total compute — which they almost certainly did
-   2018–2024. Phase 3 (allocation) is where this is quantified.
-2. **The historical 6×/yr rate is unsustainable on Phase 2 fundamentals,
+   2018–2024. the allocation layer is where this is quantified.
+2. **The historical 6×/yr rate is unsustainable on supply fundamentals,
    regardless of share dynamics.** Even capex-rich (50%/yr) is one full
-   OOM slower per year than Phase 1.
-3. **Sourced inputs increased Phase 2 output growth by ~8 percentage
+   OOM slower per year than the historical baseline.
+3. **Sourced inputs increased supply output growth by ~8 percentage
    points** vs sprint 1's placeholders (38% → 46% base case CAGR), but
    did not close the gap. The conclusion holds.
 
@@ -41,7 +41,7 @@ Three honest readings of the Phase 1 vs Phase 2 gap:
 
 ## 2. Data sources (sprint 2)
 
-Source codes used in `data/assumptions/phase2_input_assumptions.csv`:
+Source codes used in `data/assumptions/supply_input_assumptions.yaml`:
 
 | Code | Source | Date |
 |---|---|---|
@@ -129,10 +129,10 @@ falls to `0.65` by 2040 in `power_dc_bottleneck`.
 - Stock: 2.8M → 387M.
 - Power capacity itself never binds in any scenario under our 24× efficiency improvement — the binding is on physical buildout density, not raw MW.
 
-## 6. Cost variant trajectories (Phase 1 carryover)
+## 6. Cost variant trajectories (historical-baseline carryover)
 
-Per Phase 1's most important finding (cost-variant divergence is bigger
-than rule-choice divergence), Phase 2 carries three cost-per-H100e-year
+Per the historical baseline's most important finding (cost-variant divergence is bigger
+than rule-choice divergence), the supply capacity model carries three cost-per-H100e-year
 variants forward.
 
 Base scenario, 2024 → 2040:
@@ -146,12 +146,12 @@ Base scenario, 2024 → 2040:
 Persistent ~10% gap between cloud and upfront, narrowing toward 2040.
 Under chip-bottleneck the cloud rate runs ~50–80% higher than under
 base case, peaking at the supply-tightest moments. Chart:
-`outputs/charts/phase2_cost_per_h100e_by_variant.png`.
+`outputs/charts/supply_cost_per_h100e_by_variant.png`.
 
 ## 7. Sensitivity (one-parameter perturbations of base case)
 
-`outputs/charts/phase2_sensitivity_bands.png` and
-`outputs/tables/phase2_sensitivity_analysis.csv`. Each parameter scaled
+`outputs/charts/supply_sensitivity_bands.png` and
+`outputs/tables/supply_sensitivity_analysis.csv`. Each parameter scaled
 by {0.5, 0.75, 1.0, 1.5, 2.0} for all years, holding everything else
 at base.
 
@@ -164,14 +164,14 @@ at base.
 | Capex × 0.5 | ~0.55× (capex was already binding) |
 | Capex × 2.0 | ~1.4× (chip starts binding earlier) |
 
-**Implication for Phase 3:** capex and shipments are the two highest-leverage parameters for the base case. AI-DC MW is slack under base assumptions and only matters when something else moves it in.
+**Implication for the allocation layer:** capex and shipments are the two highest-leverage parameters for the base case. AI-DC MW is slack under base assumptions and only matters when something else moves it in.
 
 ## 8. Key uncertainties
 
-1. **Single-run vs aggregate compute confusion (most important).** Phase 1
-   measures single training-run FLOP for a frontier model. Phase 2
+1. **Single-run vs aggregate compute confusion (most important).** the historical baseline
+   measures single training-run FLOP for a frontier model. the supply capacity model
    measures total annual usable global AI compute. Comparing them
-   directly is not apples-to-apples. Phase 3 must explicitly model the
+   directly is not apples-to-apples. the allocation layer must explicitly model the
    share of total annual compute consumed by the largest single run.
 2. **Hyperscaler capex AI-share bias.** We treat ~75% of hyperscaler
    capex as AI infrastructure for 2025+. The actual share is debated;
@@ -196,9 +196,9 @@ at base.
 8. **No quarterly grain.** 2024 and 2025 are now fully observed and a
    quarterly calibration would tighten the modern-window levels.
 
-## 9. Recommended Phase 3 handoff parameters
+## 9. Recommended allocation-layer handoff parameters
 
-These are the explicit handoff parameters for Phase 3 (allocation
+These are the explicit handoff parameters for the allocation layer (allocation
 across training, inference, AI R&D, post-training, reserves).
 
 ```
@@ -213,9 +213,9 @@ Year   Base         Capex-rich   Chip-bot     Power/DC-bot
 2035   4.93e+30     8.69e+30     2.15e+30     2.39e+30
 2040   1.65e+31     2.89e+31     6.54e+30     6.64e+30
 
-Read full CSV: outputs/tables/phase2_fundamental_inputs_by_year.csv
+Read full CSV: outputs/tables/supply_fundamental_inputs_by_year.csv
 
-=== Recommended Phase 3 base-case envelope ===
+=== Recommended the allocation layer base-case envelope ===
 Use base_input_case as the central case.
 Use chip_bottleneck as the slow / pessimistic floor.
 Use capex_rich as the fast / optimistic ceiling.
@@ -254,30 +254,30 @@ upfront-amortized: $13,200 → $4,550
 cloud-rental:      $15,000 → $5,000
 blended:           $14,100 → $4,775
 
-(All three trajectories should be carried forward into Phase 3 — the
-divergence is a real economic signal per Phase 1 findings.)
+(All three trajectories should be carried forward into the allocation layer — the
+divergence is a real economic signal per historical-baseline findings.)
 ```
 
-### Known weaknesses (carry forward to Phase 3 documentation)
+### Known weaknesses (carry forward to allocation-layer documentation)
 
-- Single-frontier-run share of total compute is the largest unmodeled quantity. Phase 3 must address this.
+- Single-frontier-run share of total compute is the largest unmodeled quantity. the allocation layer must address this.
 - 2030 H100-eq stock estimate has 20× spread between Epoch lower and upper bounds.
 - ~18% of assumption rows are still `confidence=low` — mostly the 2040 long-horizon values, which are extrapolations.
 - No geographic structure.
 - Cumulative-capex limit treatment is simplified (we sum annual flows; depreciation / write-downs / refinancing are not modeled).
 
-## 10. Open questions for Phase 3
+## 10. Open questions for the allocation layer
 
 1. **What share of usable compute goes to a single largest training
    run by year?** 2018: probably ~15% of frontier-lab compute. 2024:
-   probably 5–10% globally. Phase 3 should make this explicit and
+   probably 5–10% globally. the allocation layer should make this explicit and
    variable.
-2. **Training vs inference allocation.** Phase 3 needs a split, ideally
+2. **Training vs inference allocation.** the allocation layer needs a split, ideally
    parameterized — base case probably ~35% training, ~55% inference,
    ~10% reserves/post-training as of 2024, with the inference share
    growing.
 3. **AI R&D experiments share.** This is the wedge that grows fastest
-   if recursive self-improvement is real; Phase 3 should isolate it.
+   if recursive self-improvement is real; the allocation layer should isolate it.
 4. **Reserved capacity and cluster fragmentation.** Not all H100-eq
    stock is fungible — reserved capacity, geographic fragmentation,
    and lab-specific pools all shrink the effectively-allocatable pool
@@ -285,7 +285,7 @@ divergence is a real economic signal per Phase 1 findings.)
 5. **Allocation under a binding constraint.** When chips bind, who
    gets them? Hyperscalers, sovereign programs, frontier labs, and
    inference cloud customers all compete for the same pool. This is a
-   Phase 3 question.
+   allocation-layer question.
 
 ---
 
@@ -293,24 +293,24 @@ divergence is a real economic signal per Phase 1 findings.)
 
 | Spec deliverable | File | Status |
 |---|---|---|
-| Input assumptions file | `data/assumptions/phase2_input_assumptions.csv` | ✓ (173 rows, sourced) |
-| Fundamental input model | `model/fundamental_inputs.py` | ✓ |
-| Scenario configs (4) | `scenarios/phase2_*.yaml` | ✓ |
-| Notebook / driver | `notebooks/run_phase2_sprint2.py` | ✓ |
-| Accelerator stock chart | `outputs/charts/phase2_accelerator_stock_h100e.png` | ✓ |
-| Theoretical compute chart | `outputs/charts/phase2_theoretical_compute_capacity.png` | ✓ |
-| Usable compute chart | `outputs/charts/phase2_usable_compute_capacity.png` | ✓ |
-| Power capacity constraint chart | `outputs/charts/phase2_power_capacity_constraint.png` | ✓ (with DC differentiation) |
-| Capex required chart | `outputs/charts/phase2_capex_required.png` | ✓ |
-| Binding-constraint heatmap | `outputs/charts/phase2_binding_constraint_by_year.png` | ✓ |
-| Phase 2 vs Phase 1 chart | `outputs/charts/phase2_vs_phase1_compute_trend.png` | ✓ |
-| Cost-per-H100e by variant | `outputs/charts/phase2_cost_per_h100e_by_variant.png` | ✓ (bonus) |
-| Sensitivity bands | `outputs/charts/phase2_sensitivity_bands.png` | ✓ (bonus) |
-| Year-by-year fundamentals | `outputs/tables/phase2_fundamental_inputs_by_year.csv` | ✓ |
-| Scenario summary | `outputs/tables/phase2_scenario_summary.csv` | ✓ |
-| Binding constraints | `outputs/tables/phase2_binding_constraints.csv` | ✓ |
-| Capex requirements | `outputs/tables/phase2_capex_requirements.csv` | ✓ |
-| Sensitivity analysis | `outputs/tables/phase2_sensitivity_analysis.csv` | ✓ (bonus) |
-| Phase 2 scope | `docs/phase2_scope.md` | ✓ |
-| Phase 2 initial notes | `docs/phase2_initial_notes.md` | ✓ (sprint 1) |
-| Phase 2 findings memo | `docs/phase2_findings.md` | ✓ (this file) |
+| Input assumptions file | `data/assumptions/supply_input_assumptions.yaml` | ✓ (173 rows, sourced) |
+| Fundamental input model | `model/supply_engine.py` | ✓ |
+| Scenario configs (4) | `scenarios/supply_*.yaml` | ✓ |
+| Notebook / driver | `pipelines/supply.py` | ✓ |
+| Accelerator stock chart | `outputs/charts/supply_accelerator_stock_h100e.png` | ✓ |
+| Theoretical compute chart | `outputs/charts/supply_theoretical_compute_capacity.png` | ✓ |
+| Usable compute chart | `outputs/charts/supply_usable_compute_capacity.png` | ✓ |
+| Power capacity constraint chart | `outputs/charts/supply_power_capacity_constraint.png` | ✓ (with DC differentiation) |
+| Capex required chart | `outputs/charts/supply_capex_required.png` | ✓ |
+| Binding-constraint heatmap | `outputs/charts/supply_binding_constraint_by_year.png` | ✓ |
+| Supply vs historical-baseline chart | `outputs/charts/supply_vs_historical_compute_trend.png` | ✓ |
+| Cost-per-H100e by variant | `outputs/charts/supply_cost_per_h100e_by_variant.png` | ✓ (bonus) |
+| Sensitivity bands | `outputs/charts/supply_sensitivity_bands.png` | ✓ (bonus) |
+| Year-by-year fundamentals | `outputs/tables/supply_fundamental_inputs_by_year.csv` | ✓ |
+| Scenario summary | `outputs/tables/supply_scenario_summary.csv` | ✓ |
+| Binding constraints | `outputs/tables/supply_binding_constraints.csv` | ✓ |
+| Capex requirements | `outputs/tables/supply_capex_requirements.csv` | ✓ |
+| Sensitivity analysis | `outputs/tables/supply_sensitivity_analysis.csv` | ✓ (bonus) |
+| the supply capacity model scope | `docs/scope.md` | ✓ |
+| the supply capacity model initial notes | `docs/supply_initial_notes.md` | ✓ (sprint 1) |
+| the supply capacity model findings memo | `docs/supply_findings.md` | ✓ (this file) |
