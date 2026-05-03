@@ -1,0 +1,13 @@
+# Phase 2 — Capex-Rich Acceleration
+# Hyperscalers, governments, and AI labs massively increase AI infrastructure investment.
+name: capex_rich
+display_name: "Capex-rich acceleration"
+description: >
+  Strongly increased AI infrastructure investment (sovereign AI programs,
+  hyperscaler capex, dedicated long-term financing). All other constraints
+  remain at base-case values, isolating the effect of money flowing in.
+
+assumption_scenario: capex_rich
+
+start_year: 2024
+end_year: 2040

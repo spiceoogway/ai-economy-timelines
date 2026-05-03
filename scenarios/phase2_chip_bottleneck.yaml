@@ -1,0 +1,14 @@
+# Phase 2 — Chip-Constrained
+# Demand and capex exist; accelerator supply grows slowly.
+name: chip_bottleneck
+display_name: "Chip-constrained"
+description: >
+  Capex and power are abundant but accelerator shipments are constrained
+  (TSMC capacity, packaging bottlenecks, HBM supply, export controls).
+  Tests whether the binding constraint shifts from chips to power/capex
+  as buildout proceeds.
+
+assumption_scenario: chip_bottleneck
+
+start_year: 2024
+end_year: 2040

@@ -1,0 +1,9 @@
+scenario,binding_constraint,years_binding
+base_input_case,chip,12
+base_input_case,capex,5
+capex_rich,chip,16
+capex_rich,capex,1
+chip_bottleneck,chip,14
+chip_bottleneck,capex,3
+power_datacenter_bottleneck,power,14
+power_datacenter_bottleneck,capex,3

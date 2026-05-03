@@ -1,0 +1,16 @@
+# Phase 2 — Baseline Continuation
+# Central case using Phase 1 handoff assumptions as an output check.
+name: base_input_case
+display_name: "Baseline continuation"
+description: >
+  Central scenario. Accelerator shipments grow ~50%/yr through 2030 then
+  taper. Power and data-center buildout keep pace. Capex grows ~50%/yr.
+  Used to check whether the input model can plausibly reproduce the
+  Phase 1 historical compute trend (~6×/yr Rule A 2018+).
+
+# Which 'scenario' rows to load from data/assumptions/phase2_input_assumptions.csv
+assumption_scenario: base
+
+# Year range for projections
+start_year: 2024
+end_year: 2040

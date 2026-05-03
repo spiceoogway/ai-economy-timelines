@@ -1,0 +1,135 @@
+parameter,scenario,year,value,unit,source,confidence,notes
+# === Accelerator shipments (H100-equivalent units per year) ===
+# Base case: ~50%/yr growth through 2030, taper toward 2040.
+h100_equivalent_shipments,base,2024,5000000,units,placeholder_round_number,low,Sprint-1 placeholder. Refine with NVIDIA + AMD + TPU + Trainium reported shipments.
+h100_equivalent_shipments,base,2025,8000000,units,placeholder_round_number,low,Sprint-1 placeholder. ~60% YoY.
+h100_equivalent_shipments,base,2030,40000000,units,placeholder_round_number,low,Sprint-1 placeholder. ~38% CAGR 2025-2030.
+h100_equivalent_shipments,base,2040,150000000,units,placeholder_round_number,low,Sprint-1 placeholder. Slowing growth.
+h100_equivalent_shipments,chip_bottleneck,2024,5000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,chip_bottleneck,2025,6000000,units,placeholder_round_number,low,~20% YoY (constrained).
+h100_equivalent_shipments,chip_bottleneck,2030,12000000,units,placeholder_round_number,low,~15% CAGR.
+h100_equivalent_shipments,chip_bottleneck,2040,30000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,power_dc_bottleneck,2024,5000000,units,placeholder_round_number,low,Same as base (chips abundant).
+h100_equivalent_shipments,power_dc_bottleneck,2025,8000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,power_dc_bottleneck,2030,40000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,power_dc_bottleneck,2040,150000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,capex_rich,2024,5000000,units,placeholder_round_number,low,Same as base (chips abundant).
+h100_equivalent_shipments,capex_rich,2025,9000000,units,placeholder_round_number,low,
+h100_equivalent_shipments,capex_rich,2030,60000000,units,placeholder_round_number,low,~46% CAGR.
+h100_equivalent_shipments,capex_rich,2040,300000000,units,placeholder_round_number,low,
+
+# === Accelerator lifetime (years) — used for retirement curve ===
+accelerator_lifetime_years,base,2024,5,years,placeholder_round_number,low,5-year linear retirement assumption.
+accelerator_lifetime_years,chip_bottleneck,2024,5,years,placeholder_round_number,low,
+accelerator_lifetime_years,power_dc_bottleneck,2024,5,years,placeholder_round_number,low,
+accelerator_lifetime_years,capex_rich,2024,5,years,placeholder_round_number,low,
+
+# === Peak FLOP/s per H100-equivalent chip (FP16/BF16 dense) ===
+# By definition stays at H100 peak. Stock units already in H100-eq.
+peak_flops_per_h100e,base,2024,9.89e14,flops,nvidia_h100_spec,medium,H100 SXM ~989 TFLOPS FP16 dense. Constant by H100-eq definition.
+peak_flops_per_h100e,chip_bottleneck,2024,9.89e14,flops,nvidia_h100_spec,medium,
+peak_flops_per_h100e,power_dc_bottleneck,2024,9.89e14,flops,nvidia_h100_spec,medium,
+peak_flops_per_h100e,capex_rich,2024,9.89e14,flops,nvidia_h100_spec,medium,
+
+# === Power per H100-equivalent chip (kW; chip only, no overheads) ===
+# Trends down as efficiency improves at constant H100-eq.
+power_kw_per_h100e,base,2024,0.7,kw,nvidia_h100_spec,medium,H100 SXM ~700W chip TDP.
+power_kw_per_h100e,base,2030,0.45,kw,placeholder_round_number,low,Sprint-1 placeholder for efficiency improvement.
+power_kw_per_h100e,base,2040,0.3,kw,placeholder_round_number,low,
+power_kw_per_h100e,chip_bottleneck,2024,0.7,kw,nvidia_h100_spec,medium,
+power_kw_per_h100e,chip_bottleneck,2030,0.45,kw,placeholder_round_number,low,
+power_kw_per_h100e,chip_bottleneck,2040,0.3,kw,placeholder_round_number,low,
+power_kw_per_h100e,power_dc_bottleneck,2024,0.7,kw,nvidia_h100_spec,medium,
+power_kw_per_h100e,power_dc_bottleneck,2030,0.45,kw,placeholder_round_number,low,
+power_kw_per_h100e,power_dc_bottleneck,2040,0.3,kw,placeholder_round_number,low,
+power_kw_per_h100e,capex_rich,2024,0.7,kw,nvidia_h100_spec,medium,
+power_kw_per_h100e,capex_rich,2030,0.45,kw,placeholder_round_number,low,
+power_kw_per_h100e,capex_rich,2040,0.3,kw,placeholder_round_number,low,
+
+# === Server / cluster power overhead multiplier (chip → board → server) ===
+server_power_overhead,base,2024,1.5,multiplier,placeholder_round_number,low,Adds CPUs / NICs / storage / power-delivery losses.
+server_power_overhead,chip_bottleneck,2024,1.5,multiplier,placeholder_round_number,low,
+server_power_overhead,power_dc_bottleneck,2024,1.5,multiplier,placeholder_round_number,low,
+server_power_overhead,capex_rich,2024,1.5,multiplier,placeholder_round_number,low,
+
+# === Data-center PUE ===
+pue,base,2024,1.2,multiplier,industry_typical,medium,Modern hyperscale AI DC ~1.15-1.25.
+pue,base,2040,1.1,multiplier,placeholder_round_number,low,Improves slightly with liquid cooling at scale.
+pue,chip_bottleneck,2024,1.2,multiplier,industry_typical,medium,
+pue,chip_bottleneck,2040,1.1,multiplier,placeholder_round_number,low,
+pue,power_dc_bottleneck,2024,1.2,multiplier,industry_typical,medium,
+pue,power_dc_bottleneck,2040,1.1,multiplier,placeholder_round_number,low,
+pue,capex_rich,2024,1.2,multiplier,industry_typical,medium,
+pue,capex_rich,2040,1.1,multiplier,placeholder_round_number,low,
+
+# === AI data-center capacity (MW, global) ===
+ai_datacenter_capacity_mw,base,2024,15000,mw,placeholder_round_number,low,Sprint-1 placeholder. ~15 GW AI-DC globally end-2024.
+ai_datacenter_capacity_mw,base,2025,30000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,base,2030,150000,mw,placeholder_round_number,low,~150 GW central case.
+ai_datacenter_capacity_mw,base,2040,500000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,chip_bottleneck,2024,15000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,chip_bottleneck,2025,30000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,chip_bottleneck,2030,150000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,chip_bottleneck,2040,500000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,power_dc_bottleneck,2024,15000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,power_dc_bottleneck,2025,22000,mw,placeholder_round_number,low,Slow buildout.
+ai_datacenter_capacity_mw,power_dc_bottleneck,2030,60000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,power_dc_bottleneck,2040,150000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,capex_rich,2024,15000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,capex_rich,2025,32000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,capex_rich,2030,200000,mw,placeholder_round_number,low,
+ai_datacenter_capacity_mw,capex_rich,2040,800000,mw,placeholder_round_number,low,
+
+# === AI share of DC power (after subtracting non-AI workloads) ===
+ai_share_of_dc_power,base,2024,0.85,fraction,placeholder_round_number,low,Most of dedicated AI-DC capacity is AI-only.
+ai_share_of_dc_power,chip_bottleneck,2024,0.85,fraction,placeholder_round_number,low,
+ai_share_of_dc_power,power_dc_bottleneck,2024,0.85,fraction,placeholder_round_number,low,
+ai_share_of_dc_power,capex_rich,2024,0.85,fraction,placeholder_round_number,low,
+
+# === Cluster utilization (fraction of theoretical peak) ===
+cluster_utilization,base,2024,0.45,fraction,placeholder_round_number,low,Realistic blended training+inference; MFU ~35-50%.
+cluster_utilization,base,2040,0.55,fraction,placeholder_round_number,low,Improves slightly.
+cluster_utilization,chip_bottleneck,2024,0.45,fraction,placeholder_round_number,low,
+cluster_utilization,chip_bottleneck,2040,0.55,fraction,placeholder_round_number,low,
+cluster_utilization,power_dc_bottleneck,2024,0.45,fraction,placeholder_round_number,low,
+cluster_utilization,power_dc_bottleneck,2040,0.55,fraction,placeholder_round_number,low,
+cluster_utilization,capex_rich,2024,0.45,fraction,placeholder_round_number,low,
+cluster_utilization,capex_rich,2040,0.55,fraction,placeholder_round_number,low,
+
+# === Accelerator unit cost (USD per H100-equivalent) ===
+accelerator_unit_cost_usd,base,2024,30000,usd,placeholder_round_number,low,Headline H100 ASP.
+accelerator_unit_cost_usd,base,2030,18000,usd,placeholder_round_number,low,Falling per-H100e cost.
+accelerator_unit_cost_usd,base,2040,9000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,chip_bottleneck,2024,35000,usd,placeholder_round_number,low,Tighter supply; higher prices.
+accelerator_unit_cost_usd,chip_bottleneck,2030,28000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,chip_bottleneck,2040,18000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,power_dc_bottleneck,2024,30000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,power_dc_bottleneck,2030,18000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,power_dc_bottleneck,2040,9000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,capex_rich,2024,30000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,capex_rich,2030,18000,usd,placeholder_round_number,low,
+accelerator_unit_cost_usd,capex_rich,2040,9000,usd,placeholder_round_number,low,
+
+# === Cluster capex multiplier on chip cost (server + networking + DC + power infra) ===
+cluster_capex_multiplier,base,2024,2.0,multiplier,placeholder_round_number,low,Doubles chip cost to get installed-cluster cost.
+cluster_capex_multiplier,chip_bottleneck,2024,2.0,multiplier,placeholder_round_number,low,
+cluster_capex_multiplier,power_dc_bottleneck,2024,2.4,multiplier,placeholder_round_number,low,Higher because power infra scarce.
+cluster_capex_multiplier,capex_rich,2024,2.0,multiplier,placeholder_round_number,low,
+
+# === Available AI infrastructure capex (USD/year, global) ===
+ai_infrastructure_capex_usd,base,2024,2.5e11,usd,placeholder_round_number,low,~$250B in 2024.
+ai_infrastructure_capex_usd,base,2025,4.0e11,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,base,2030,1.5e12,usd,placeholder_round_number,low,~$1.5T/yr.
+ai_infrastructure_capex_usd,base,2040,3.0e12,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,chip_bottleneck,2024,2.5e11,usd,placeholder_round_number,low,Capex unconstrained but chips bind.
+ai_infrastructure_capex_usd,chip_bottleneck,2025,4.0e11,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,chip_bottleneck,2030,1.5e12,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,chip_bottleneck,2040,3.0e12,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,power_dc_bottleneck,2024,2.5e11,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,power_dc_bottleneck,2025,4.0e11,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,power_dc_bottleneck,2030,1.5e12,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,power_dc_bottleneck,2040,3.0e12,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,capex_rich,2024,3.0e11,usd,placeholder_round_number,low,Larger 2024 baseline.
+ai_infrastructure_capex_usd,capex_rich,2025,5.5e11,usd,placeholder_round_number,low,
+ai_infrastructure_capex_usd,capex_rich,2030,3.0e12,usd,placeholder_round_number,low,~$3T/yr by 2030.
+ai_infrastructure_capex_usd,capex_rich,2040,8.0e12,usd,placeholder_round_number,low,

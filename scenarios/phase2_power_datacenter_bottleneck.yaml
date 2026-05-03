@@ -1,0 +1,14 @@
+# Phase 2 — Power / Data-Center Constrained
+# Chips and capital exist; grid interconnection and DC buildout limit deployment.
+name: power_datacenter_bottleneck
+display_name: "Power / data-center constrained"
+description: >
+  Chips are available and capex flows freely, but transmission queues,
+  permitting, transformers, cooling, and dedicated AI data-center capacity
+  bottleneck deployment. Power capacity grows slowly even as accelerator
+  supply expands.
+
+assumption_scenario: power_dc_bottleneck
+
+start_year: 2024
+end_year: 2040
