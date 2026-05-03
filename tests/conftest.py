@@ -101,10 +101,6 @@ def tmp_assumptions_yaml(tmp_path: Path) -> Path:
             "unit": "usd",
             "scenarios": {"tiny": {"milestones": [{"year": 2024, "value": 15_000}]}},
         },
-        "hardware_perf_index_relative_to_h100": {
-            "unit": "multiplier",
-            "scenarios": {"tiny": {"milestones": [{"year": 2024, "value": 1.0}]}},
-        },
     }
     p = tmp_path / "assumptions.yaml"
     p.write_text(yaml.safe_dump(data, sort_keys=False))

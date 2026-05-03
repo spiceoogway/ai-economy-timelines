@@ -262,9 +262,6 @@ def project_scenario(
     cloud_year = _series_for(
         assumptions, s, years, "cloud_rental_usd_per_h100e_year", log=True
     )
-    perf_index = _series_for(
-        assumptions, s, years, "hardware_perf_index_relative_to_h100", log=False
-    )
 
     # Chip-limited stock comes straight from shipments + retirement.
     chip_stock = project_accelerator_stock(shipments, lifetime.iloc[0])
@@ -317,7 +314,6 @@ def project_scenario(
             "ai_infrastructure_capex_usd": capex.values,
             "accelerator_unit_cost_usd": chip_cost.values,
             "cluster_capex_multiplier": cluster_mult.values,
-            "hardware_perf_index_relative_to_h100": perf_index.values,
             # Three Phase 1 cost variants — preserved per phase1_findings.md
             # because the divergence is the single largest cost uncertainty.
             "cost_per_h100e_year_upfront": (
