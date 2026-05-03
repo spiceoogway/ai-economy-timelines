@@ -55,6 +55,34 @@ SCENARIO_MARKERS = {
     "power_datacenter_bottleneck": "D",
 }
 
+# Allocation scenarios. Keys must match the `name:` field in
+# scenarios/allocation_*.yaml. Distinct from SCENARIO_COLORS so
+# scenario-grid charts (which combine supply × allocation) can colour
+# the two axes independently.
+ALLOCATION_SCENARIO_COLORS = {
+    "allocation_base": "tab:blue",
+    "allocation_inference_heavy": "tab:purple",
+    "allocation_training_race": "tab:red",
+    "allocation_rnd_acceleration": "tab:olive",
+}
+
+ALLOCATION_SCENARIO_MARKERS = {
+    "allocation_base": "o",
+    "allocation_inference_heavy": "s",
+    "allocation_training_race": "^",
+    "allocation_rnd_acceleration": "D",
+}
+
+# Allocation buckets — matches model.allocation_engine.BUCKET_SHARES.
+BUCKET_COLORS = {
+    "inference": "tab:blue",
+    "training": "tab:red",
+    "ai_rnd_experiment": "tab:green",
+    "post_training": "tab:orange",
+    "safety_eval": "tab:purple",
+    "reserved_idle_fragmented": "#888888",
+}
+
 # Supply binding-constraint categories. Keys must match the entries in
 # supply_engine.CONSTRAINTS.
 CONSTRAINT_COLORS = {

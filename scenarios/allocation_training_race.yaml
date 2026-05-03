@@ -1,0 +1,14 @@
+# Allocation — training race
+# Labs and governments prioritize frontier runs; training share and concentration stay high.
+name: allocation_training_race
+display_name: "Training race"
+description: >
+  Frontier labs and sovereign-AI programs prioritize training. Training
+  share holds at 30→35% (vs base case decay to 18%); largest-run
+  concentration stays high (20% through 2030, 15% by 2040); cluster
+  contiguity stays near maximum on dedicated frontier-AI campuses.
+
+assumption_scenario: allocation_training_race
+
+start_year: 2024
+end_year: 2040

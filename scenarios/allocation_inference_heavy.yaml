@@ -1,0 +1,14 @@
+# Allocation — inference-heavy
+# Commercial demand absorbs most compute; training shrinks faster.
+name: allocation_inference_heavy
+display_name: "Inference-heavy allocation"
+description: >
+  Commercial inference demand absorbs most compute. Inference share grows
+  to 78% by 2040; training share shrinks to 10%. Largest-run concentration
+  falls aggressively as the frontier-lab pool consumes a smaller wedge of
+  total training compute.
+
+assumption_scenario: allocation_inference_heavy
+
+start_year: 2024
+end_year: 2040

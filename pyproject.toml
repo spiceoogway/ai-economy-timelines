@@ -17,6 +17,7 @@ dependencies = [
 [project.scripts]
 historical = "pipelines.historical:main"
 supply = "pipelines.supply:main"
+allocation = "pipelines.allocation:main"
 
 [dependency-groups]
 dev = [

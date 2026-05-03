@@ -1,0 +1,13 @@
+# Allocation — base case
+# Central allocation scenario; inference dominates but training remains material.
+name: allocation_base
+display_name: "Base allocation"
+description: >
+  Central allocation case. Inference share rises slowly (55→65%); training
+  share decays (30→18%); AI R&D rises modestly (8→10%); largest-run
+  concentration falls as more frontier labs build large runs (20%→5%).
+
+assumption_scenario: allocation_base
+
+start_year: 2024
+end_year: 2040

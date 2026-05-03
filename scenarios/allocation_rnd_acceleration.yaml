@@ -1,0 +1,15 @@
+# Allocation — R&D acceleration
+# AI R&D experiments consume a rising share; the experiment loop becomes increasingly important.
+name: allocation_rnd_acceleration
+display_name: "R&D acceleration"
+description: >
+  The frontier-lab AI R&D experiment loop (ablations, scaling-law sweeps,
+  post-training research, safety evals) becomes increasingly compute-
+  intensive. AI R&D experiment share rises 8→20%; training share decays
+  to 18%; largest-run concentration falls to 7% as more compute goes
+  into experimentation rather than single big runs.
+
+assumption_scenario: allocation_rnd_acceleration
+
+start_year: 2024
+end_year: 2040
