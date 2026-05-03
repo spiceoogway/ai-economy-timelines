@@ -21,6 +21,7 @@ historical = "pipelines.historical:main"
 supply = "pipelines.supply:main"
 allocation = "pipelines.allocation:main"
 database = "pipelines.build_review_database:main"
+workbook = "pipelines.export_workbook:main"
 
 [dependency-groups]
 dev = [
