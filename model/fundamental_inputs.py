@@ -153,14 +153,22 @@ def power_limited_h100e_stock(
 
 
 def datacenter_limited_h100e_stock(
-    ai_dc_mw: pd.Series, chip_kw: pd.Series, server_overhead: pd.Series, pue: pd.Series
+    ai_dc_mw: pd.Series,
+    chip_kw: pd.Series,
+    server_overhead: pd.Series,
+    pue: pd.Series,
+    dc_packing_efficiency: pd.Series,
 ) -> pd.Series:
-    """For sprint 1 we model the DC constraint as the AI-MW envelope at
-    the chassis density implied by chip+server+PUE — i.e. without applying
-    the AI-share factor. Differentiating power vs DC further (transformer
-    bottlenecks, slot count vs MW) is sprint-2 work."""
+    """DC constraint on chip count from physical buildout, separate from the
+    grid-power constraint. `dc_packing_efficiency` ∈ [0, 1] captures
+    cooling, slot density, transformer slack, and permitting drag — i.e.
+    the fraction of DC-MW that can actually be populated with frontier-
+    AI accelerators. 1.0 = no constraint above grid; 0.7 = cooling and
+    cabling bind 30% earlier."""
     eff_kw = chip_kw * server_overhead * pue
-    return (ai_dc_mw * 1000.0 / eff_kw).rename("datacenter_limited_h100e_stock")
+    return (ai_dc_mw * dc_packing_efficiency * 1000.0 / eff_kw).rename(
+        "datacenter_limited_h100e_stock"
+    )
 
 
 def capex_limited_h100e_stock(
@@ -193,17 +201,26 @@ def project_scenario(
     pue = _series_for(assumptions, s, years, "pue", log=False)
     ai_dc_mw = _series_for(assumptions, s, years, "ai_datacenter_capacity_mw", log=True)
     ai_share = _series_for(assumptions, s, years, "ai_share_of_dc_power", log=False)
+    dc_packing = _series_for(assumptions, s, years, "dc_packing_efficiency", log=False)
     util = _series_for(assumptions, s, years, "cluster_utilization", log=False)
     chip_cost = _series_for(assumptions, s, years, "accelerator_unit_cost_usd", log=True)
     cluster_mult = _series_for(assumptions, s, years, "cluster_capex_multiplier", log=False)
     capex = _series_for(assumptions, s, years, "ai_infrastructure_capex_usd", log=True)
+    cloud_year = _series_for(
+        assumptions, s, years, "cloud_rental_usd_per_h100e_year", log=True
+    )
+    perf_index = _series_for(
+        assumptions, s, years, "hardware_perf_index_relative_to_h100", log=False
+    )
 
     # Chip-limited stock comes straight from shipments + retirement.
     chip_stock = project_accelerator_stock(shipments, lifetime.iloc[0])
 
     # Power and DC limits: how many H100e can be installed under AI-MW.
     power_stock = power_limited_h100e_stock(ai_dc_mw, ai_share, chip_kw, server_oh, pue)
-    dc_stock = datacenter_limited_h100e_stock(ai_dc_mw, chip_kw, server_oh, pue)
+    dc_stock = datacenter_limited_h100e_stock(
+        ai_dc_mw, chip_kw, server_oh, pue, dc_packing
+    )
 
     # Capex limit: cumulative.
     capex_stock = capex_limited_h100e_stock(capex, chip_cost, cluster_mult)
@@ -243,15 +260,52 @@ def project_scenario(
             "usable_compute_flop_year": usable_flop_per_year.values,
             "ai_power_capacity_mw": ai_dc_mw.values,
             "datacenter_capacity_mw": ai_dc_mw.values,
+            "dc_packing_efficiency": dc_packing.values,
             "ai_infrastructure_capex_usd": capex.values,
             "accelerator_unit_cost_usd": chip_cost.values,
             "cluster_capex_multiplier": cluster_mult.values,
-            "capex_per_h100e_year": (
+            "hardware_perf_index_relative_to_h100": perf_index.values,
+            # Three Phase 1 cost variants — preserved per phase1_findings.md
+            # because the divergence is the single largest cost uncertainty.
+            "cost_per_h100e_year_upfront": (
                 chip_cost * cluster_mult / lifetime
-            ).values,  # rough $/H100e/yr amortized
+            ).values,
+            "cost_per_h100e_year_cloud": cloud_year.values,
+            "cost_per_h100e_year_blended": (
+                0.5 * chip_cost * cluster_mult / lifetime + 0.5 * cloud_year
+            ).values,
         }
     )
     return out
+
+
+def sensitivity_analysis(
+    base_scenario: ScenarioConfig,
+    assumptions: pd.DataFrame,
+    *,
+    parameter: str,
+    multipliers: list[float],
+) -> pd.DataFrame:
+    """Vary a single parameter (multiplied by each value in `multipliers`)
+    while holding everything else at the base scenario, returning one
+    annual frame per multiplier with a `sensitivity_multiplier` column.
+
+    For multi-year parameters, the multiplier is applied to every year.
+    """
+    rows = []
+    for m in multipliers:
+        a = assumptions.copy()
+        mask = a["parameter"] == parameter
+        if not mask.any():
+            raise KeyError(f"parameter {parameter!r} not in assumptions table")
+        # Only modify rows for the base scenario.
+        scen_mask = mask & (a["scenario"] == base_scenario.assumption_scenario)
+        a.loc[scen_mask, "value"] = a.loc[scen_mask, "value"] * m
+        df = project_scenario(base_scenario, a)
+        df["sensitivity_parameter"] = parameter
+        df["sensitivity_multiplier"] = m
+        rows.append(df)
+    return pd.concat(rows, ignore_index=True)
 
 
 def load_all_scenarios() -> list[ScenarioConfig]:
